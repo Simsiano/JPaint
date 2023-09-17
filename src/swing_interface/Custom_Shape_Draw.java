@@ -11,19 +11,17 @@ import graphical_logic.Colori;
 
 public class Custom_Shape_Draw extends JPanel {
 	
-private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-private Colori colori = new Colori();
+	private Colori colori = new Colori();
 	
-	public Custom_Shape_Draw() {
-	}
+	public Custom_Shape_Draw() {}
 	
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D)g;
 		GradientPaint paint = new GradientPaint(0, 75, colori.getColoreGradienza1(), 100, 100, colori.getColoreGradienza2());
-//		System.out.println("Colore1 paintCompinnt: " + coloreGradienza1 + "colore 2 paint" + coloreGradienza2);
 		g2d.setPaint(paint);
 		g2d.fillRect(0, 75, 100, 100);
 		repaint();
