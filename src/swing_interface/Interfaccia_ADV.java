@@ -1,7 +1,7 @@
 /*
  * Decompiled with CFR 0.151.
  */
-package jpaint_interface;
+package swing_interface;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -13,9 +13,9 @@ import java.awt.GridLayout;
 import java.awt.Window.Type;
 import javax.swing.*;
 
-public class jpaint_interfaccia_avanzata {
+public class Interfaccia_ADV {
 	
-	private jpaint_icone icona = new jpaint_icone();
+	private Icone icona = new Icone();
 	
 	public JButton btnMatita = new JButton();
 	public JButton btnGomma = new JButton();
@@ -49,7 +49,7 @@ public class jpaint_interfaccia_avanzata {
 		frame.setVisible(true);
 		frame.getContentPane();
         return frame;
-        
     }
+	
 }
 

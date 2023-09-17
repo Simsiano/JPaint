@@ -1,57 +1,68 @@
-package jpaint_graphics;
+package graphical_logic;
 
 import java.awt.BasicStroke;
-import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 import javax.swing.JPanel;
 
-public class jpaint_grafica extends JPanel {
+public class Grafica extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+	private Colori colore = new Colori();
 	private BufferedImage ImageBuffer = new BufferedImage(1500, 600, BufferedImage.TYPE_INT_ARGB);
 	private Graphics2D gBuffer = ImageBuffer.createGraphics();
+	public Line2D.Double linea;
 	public Rectangle quadrato;
 	public Rectangle rettangolo;
 	public Ellipse2D.Double cerchio;
-//	public Circle cerchio;
 	private int LARGHEZZA = 800;
 	private int ALTEZZA = 600;
-	private Color colorePrimario;
-	private Color coloreSecondario;
-	private Color coloreForme;
+	private GradientPaint coloreForme;
 	private boolean pieno;
+	private boolean gradientMode;
 	private int Spessore = 3;
 	private int spessoreForme = 3;
 	private int tempSpessore = 3;
 	private int posX = -1;
 	private int posY = -1;
 
-	public jpaint_grafica() {
+	public Grafica() {
 		pulisci();
 	}
 	@Override
-	public void paintComponent(Graphics g) {
+	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		gBuffer = ImageBuffer.createGraphics();
 		gBuffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		g.drawImage(ImageBuffer, 0, 0, this);
 		
+		if (linea != null) {
+			Graphics2D g2d = (Graphics2D)g;
+			g2d.setStroke(new BasicStroke(spessoreForme));
+			if (gradientMode == true) {
+				g2d.setPaint(coloreForme);
+			}
+			g2d.setPaint(coloreForme);
+			g2d.draw(linea);
+		}
+		
 		if (quadrato != null) {
 			Graphics2D g2d = (Graphics2D)g;
 			g2d.setStroke(new BasicStroke(spessoreForme));
-			g2d.setColor(coloreForme);
+			g2d.setPaint(coloreForme);
 			if (pieno == true) {
 				g2d.fill(quadrato);
-			} else {}
+			}
 			g2d.draw( quadrato );
 			repaint();
 		}
@@ -59,7 +70,7 @@ public class jpaint_grafica extends JPanel {
 		if (rettangolo != null) {
 			Graphics2D g2d = (Graphics2D)g;
 			g2d.setStroke(new BasicStroke(spessoreForme));
-			g2d.setColor(coloreForme);
+			g2d.setPaint(coloreForme);
 			if (pieno == true) {
 				g2d.fill(rettangolo);
 			} else {}
@@ -70,7 +81,7 @@ public class jpaint_grafica extends JPanel {
 		if (cerchio != null) {
 			Graphics2D g2d = (Graphics2D)g;
 			g2d.setStroke(new BasicStroke(spessoreForme));
-			g2d.setColor(coloreForme);
+			g2d.setPaint(coloreForme);
 			if (pieno == true) {
 				g2d.fill(cerchio);
 			} else {}
@@ -79,6 +90,7 @@ public class jpaint_grafica extends JPanel {
 		}
 
 	}
+	
 
 	public void pulisci() {
 		LARGHEZZA = ImageBuffer.getWidth();
@@ -88,11 +100,11 @@ public class jpaint_grafica extends JPanel {
 		repaint();
 	}
 
-	public void tracciaMatita(int x, int y, Color colore) {
+	public void tracciaMatita(int x, int y, Color color) {
 		if (posX != -1) {
 //        	float alpha = 0.25f;
 //        	Color color = new Color(colore.getRed(), colore.getGreen(), colore.getBlue(), alpha);
-			gBuffer.setColor(colore);
+			gBuffer.setPaint(color);
 			gBuffer.setStroke(new BasicStroke(Spessore));
 
 			gBuffer.drawLine(x, y, posX, posY);
@@ -104,7 +116,7 @@ public class jpaint_grafica extends JPanel {
 
 	public void tracciaGomma(int x, int y) {
 		if (posX != -1) {
-			gBuffer.setColor(Color.WHITE);
+			gBuffer.setPaint(Color.WHITE);
 			gBuffer.setStroke(new BasicStroke(20.0f));
 			gBuffer.drawLine(x, y, posX, posY);
 			repaint();
@@ -113,11 +125,11 @@ public class jpaint_grafica extends JPanel {
 		posY = y;
 	}
 	
-	public void tracciaPennello(int x, int y, Color colore) {
+	public void tracciaPennello(int x, int y, Color color) {
 		if (posX != -1) {
         	float alpha = 0.25f;
-        	Color color = new Color(colore.getRed(), colore.getGreen(), colore.getBlue(), alpha);
-			gBuffer.setColor(color);
+ //       	Color color = new Color(colore.getRed(), colore.getGreen(), colore.getBlue(), alpha);
+			gBuffer.setPaint(color);
 			gBuffer.setStroke(new BasicStroke(Spessore));
 
 			gBuffer.drawLine(x, y, posX, posY);
@@ -130,7 +142,7 @@ public class jpaint_grafica extends JPanel {
 	public void tracciaAerografo(int x, int y, Color colore) {
 		if (posX != -1) {
 			gBuffer.setColor(null);
-			gBuffer.setColor(colore);
+			gBuffer.setPaint(colore);;
 			Random random = new Random();
 			while (true) {
 				int quadrante1X = random.nextInt(41);
@@ -166,17 +178,19 @@ public class jpaint_grafica extends JPanel {
 		repaint();
 	}
 */	
-	public void aggiungiQuadrato(Rectangle quadrato, Color colore) {
-		
-		Graphics2D g2d = (Graphics2D)ImageBuffer.getGraphics();
-		g2d.setColor( colore );
-		g2d.setStroke(new BasicStroke(spessoreForme));
-		if (pieno == true) {
-			g2d.fill(quadrato);
-		}
-		g2d.draw( quadrato );
+	public void tracciamentoLinea(Point startPoint, int meX, int meY) {
+		Point endPoint = new Point(meX, meY);
+		linea = new Line2D.Double();
+		linea.setLine(startPoint, endPoint);
 		repaint();
-		
+	}
+	
+	public void aggiungiLinea(Color colore) {
+		Graphics2D g2d = (Graphics2D)ImageBuffer.getGraphics();
+		g2d.setPaint( colore );
+		g2d.setStroke(new BasicStroke(spessoreForme));
+		g2d.draw( linea );
+		repaint();
 	}
 	
 	public void tracciamentoQuadrato(Point startPoint, int meX, int meY) {
@@ -189,10 +203,37 @@ public class jpaint_grafica extends JPanel {
         repaint();
 	}
 	
-	public void aggiungiRettangolo(Rectangle rettangolo, Color colore) {
+	public void aggiungiQuadrato(Color colore) {
+		
+		Graphics2D g2d = (Graphics2D)ImageBuffer.getGraphics();
+		g2d.setPaint(colore);
+		g2d.setStroke(new BasicStroke(spessoreForme));
+		if (pieno == true) {
+			g2d.fill(quadrato);
+		}
+		g2d.draw( quadrato );
+		repaint();
+		
+	}
+	
+	public void tracciamentoRettangolo(Color colore,Point startPoint, int meX, int meY) {
+		int x = Math.min(startPoint.x, meX);
+		int y = Math.min(startPoint.y, meY);
+		int width = Math.abs(startPoint.x - meX);
+		int height = Math.abs(startPoint.y - meY);
+		if (gradientMode == true) {
+			setColoreForme(new GradientPaint(startPoint.x, startPoint.y, coloreForme.getColor1(), meX, meY, coloreForme.getColor2()));
+		} else {
+			setColoreForme(new GradientPaint(0,0,colore,0,0,colore));
+		}	
+		rettangolo.setRect(x, y, width, height);
+		repaint();
+	}
+	
+	public void aggiungiRettangolo(Color colore) {
 		
       	Graphics2D g2d = (Graphics2D)ImageBuffer.getGraphics();
-		g2d.setColor( colore );
+		g2d.setPaint( coloreForme );
 		g2d.setStroke(new BasicStroke(spessoreForme));
 		if (pieno == true) {
 			g2d.fill(rettangolo);
@@ -202,19 +243,21 @@ public class jpaint_grafica extends JPanel {
 		
 	}
 	
-	public void tracciamentoRettangolo(Point startPoint, int meX, int meY) {
-		int x = Math.min(startPoint.x, meX);
-		int y = Math.min(startPoint.y, meY);
-		int width = Math.abs(startPoint.x - meX);
-		int height = Math.abs(startPoint.y - meY);
-		rettangolo.setRect(x, y, width, height);
-		repaint();
+	public void tracciamentoCerchio(Point startPoint, int meX, int meY) {
+		
+		int radius = (int) startPoint.distance(startPoint);
+        int diameter = radius * 2;
+        int x = (int) startPoint.getX() - radius;
+        int y = (int) startPoint.getY() - radius;
+        cerchio = new Ellipse2D.Double(meX, meY, x, y);
+//        g2d.drawOval(x, y, diameter, diameter);
+		
 	}
 	
 	public void aggiungiCerchio(Ellipse2D cerchio, Color colore) {
 		
 		Graphics2D g2d = (Graphics2D)ImageBuffer.getGraphics();
-		g2d.setColor(colore);
+		g2d.setPaint(colore);
 		g2d.setStroke(new BasicStroke(spessoreForme));
 		if (pieno == true) {
 			g2d.fill(cerchio);
@@ -224,24 +267,14 @@ public class jpaint_grafica extends JPanel {
 		
 	}
 	
-	public void tracciamentoCerchio(Point startPoint, int meX, int meY) {
-		
-		Graphics2D g2d = (Graphics2D)ImageBuffer.getGraphics();
-		int radius = (int) startPoint.distance(startPoint);
-        int diameter = radius * 2;
-        int x = (int) startPoint.getX() - radius;
-        int y = (int) startPoint.getY() - radius;
-        cerchio = new Ellipse2D.Double(x, y, diameter, diameter);
-//        g2d.drawOval(x, y, diameter, diameter);
-		
-	}
 	
+/*	
 	public void tracciaLinea(Point startPoint, Point endPoint, Color colore) {
 			gBuffer.setColor(colore);
 			gBuffer.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
 			repaint();
 	}
-
+*/
 	public void resetLinea() {
 		posX = -1;
 		posY = -1;
@@ -262,24 +295,8 @@ public class jpaint_grafica extends JPanel {
 	public void setgBuffer(Graphics2D gBuffer) {
 		this.gBuffer = gBuffer;
 	}
-
-	public Color getColorePrimario() {
-		return this.colorePrimario;
-	}
-
-	public void setColorePrimario(Color colorePrimario) {
-		this.colorePrimario = colorePrimario;
-	}
-
-	public Color getColoreSecondario() {
-		return this.coloreSecondario;
-	}
-
-	public void setColoreSecondario(Color coloreSecondario) {
-		this.coloreSecondario = coloreSecondario;
-	}
 	
-	public void setColoreForme(Color coloreForme) {
+	public void setColoreForme(GradientPaint coloreForme) {
 		this.coloreForme = coloreForme;
 	}
 	
@@ -289,6 +306,14 @@ public class jpaint_grafica extends JPanel {
 	
 	public void setRiempimento(boolean pieno) {
 		this.pieno = pieno;
+	}
+	
+	public boolean getGradientMode() {
+		return this.gradientMode;
+	}
+	
+	public void setGradientMode(boolean gradientMode) {
+		this.gradientMode = gradientMode;
 	}
 
 	public int getSpessore() {

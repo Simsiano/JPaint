@@ -1,0 +1,33 @@
+import java.awt.*;
+import java.awt.event.*;
+
+public class ButtonExample {
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Esempio di bottoni");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new FlowLayout());
+
+        JButton button1 = new JButton("");
+        JButton button2 = new JButton("");
+
+        ActionListener buttonClickListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource() == button1) {
+                    System.out.println("Hai cliccato su Bottone 1");
+                } else if (e.getSource() == button2) {
+                    System.out.println("Hai cliccato su Bottone 2");
+                }
+            }
+        };
+
+        // Aggiungi lo stesso ActionListener a entrambi i bottoni
+        button1.addActionListener(buttonClickListener);
+        button2.addActionListener(buttonClickListener);
+
+        frame.add(button1);
+        frame.add(button2);
+
+        frame.pack();
+        frame.setVisible(true);
+    }
+}

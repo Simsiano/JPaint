@@ -1,7 +1,8 @@
-package jpaint_main;
+package main_package;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -30,20 +31,28 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import jpaint_graphics.jpaint_grafica;
-import jpaint_interface.jpaint_icone;
-import jpaint_interface.jpaint_interfaccia;
-import jpaint_interface.jpaint_interfaccia_avanzata;
+
+import graphical_logic.Colori;
+import graphical_logic.Grafica;
+import swing_interface.Custom_Shape;
+import swing_interface.Custom_Shape_Draw;
+import swing_interface.Icone;
+import swing_interface.Interfaccia;
+import swing_interface.Interfaccia_ADV;
+
 import javax.swing.JLabel;
 
-public class jpaint_main extends JFrame implements MouseListener, MouseMotionListener {
+public class JPaint extends JFrame implements MouseListener, MouseMotionListener {
 	private static final long serialVersionUID = 1L;
 	private JPanel pan = new JPanel();
 	private JFileChooser fileChooser = new JFileChooser();
-	private jpaint_grafica grafica = new jpaint_grafica();
-	private jpaint_interfaccia interfaccia = new jpaint_interfaccia();
-	private jpaint_interfaccia_avanzata interfaccia_adv = new jpaint_interfaccia_avanzata();
-	private jpaint_icone icona = new jpaint_icone();
+	private Grafica grafica = new Grafica();
+	private Colori colori = new Colori();
+	private Interfaccia interfaccia = new Interfaccia();
+	private Interfaccia_ADV dialoghi = new Interfaccia_ADV();
+	private Custom_Shape dialogo_personalizzazione = new Custom_Shape();
+	private Custom_Shape_Draw shapeDraw = new Custom_Shape_Draw();
+	private Icone icona = new Icone();
 	private int NumberCustomButton = 0;
 	public BufferedImage buffer;
 	public Graphics2D gBuffer;
@@ -51,12 +60,8 @@ public class jpaint_main extends JFrame implements MouseListener, MouseMotionLis
 	private int fileChoosed;
 	private String selectedItem;
 	private Point startPoint;
-	private Point endPoint;
 
-	public jpaint_main() {
-
-		grafica.setColorePrimario(Color.BLACK);
-		grafica.setColoreSecondario(Color.BLACK);
+	public JPaint() {
 
 		interfaccia.newFile.addActionListener(e -> newFile());
 		interfaccia.openFile.addActionListener(e -> openFile());
@@ -65,14 +70,18 @@ public class jpaint_main extends JFrame implements MouseListener, MouseMotionLis
 
 //		interfaccia.strumenti.addActionListener(this);
 
-		interfaccia_adv.btnMatita.addActionListener(e -> interfaceMatita(e));
-		interfaccia_adv.btnGomma.addActionListener(e -> interfaceGomma(e));
+		dialoghi.btnMatita.addActionListener(e -> interfaceMatita(e));
+		dialoghi.btnGomma.addActionListener(e -> interfaceGomma(e));
 
 		interfaccia.boxDimensioniMatita.addActionListener(e -> boxDimensionLinea());
 		interfaccia.boxTipoPennelli.addActionListener(e -> actionTipoPennelli());
 		interfaccia.btnOptionPannello.addActionListener(e -> setterPennello());
 		interfaccia.boxTipoForme.addActionListener(e -> actionTipoForme());
 		interfaccia.boxStileForme.addActionListener(e -> actionStileForme());
+		interfaccia.btnStilePersonalizzato.addActionListener(e -> dialogoAperturaPersonalizzazione(this));
+		dialogo_personalizzazione.btnColore1.addActionListener(e -> sceltaColore(e));
+		dialogo_personalizzazione.btnColore2.addActionListener(e -> sceltaColore(e));
+		dialogo_personalizzazione.btnConfermaGradienza.addActionListener(e -> gradientColorDefiner());
 
 		interfaccia.btnColoreRosso.addMouseListener(new ActionColor());
 		interfaccia.btnColoreVerde.addMouseListener(new ActionColor());
@@ -132,7 +141,6 @@ public class jpaint_main extends JFrame implements MouseListener, MouseMotionLis
 				}
 			 }
 		 });
-		System.out.println("Funziona");
 	}
 
 	private void newFile() {
@@ -272,28 +280,65 @@ public class jpaint_main extends JFrame implements MouseListener, MouseMotionLis
 	}
 
 	private void PrimaryColorDefiner(MouseEvent me) {
-		grafica.setColorePrimario(null);
-		JButton clickedButton = (JButton) me.getSource();
-		Color colorDraw = clickedButton.getBackground();
-		interfaccia.btnColorePrimario.setBackground(colorDraw);
-//		interfaccia.btnColorChange.setBackground(colorDraw);
-		grafica.setColorePrimario(colorDraw);
-//		mainp.setForeground(colorDraw);
+		colori.setColorePrimario(null);
+		interfaccia.btnColorePrimario.setBackground(colorDefiner(me));
+		colori.setColorePrimario(colorDefiner(me));
 		repaint();
 	}
 
 	private void SecondaryColorDefiner(MouseEvent me) {
-		grafica.setColoreSecondario(null);
+		colori.setColoreSecondario(null);		
+		interfaccia.btnColoreSecondario.setBackground(colorDefiner(me));
+		colori.setColoreSecondario(colorDefiner(me));
+		repaint();
+	}
+	
+	private Color colorDefiner(MouseEvent me) {
 		JButton clickedButton = (JButton) me.getSource();
 		Color colorDraw = clickedButton.getBackground();
-		interfaccia.btnColoreSecondario.setBackground(colorDraw);
-//		interfaccia.btnColorChange.setBackground(colorDraw);
-		grafica.setColoreSecondario(colorDraw);
+		return colorDraw;
+	}
+	
+	private void dialogoAperturaPersonalizzazione(JFrame frame) {
+		SwingUtilities.invokeLater(() -> {
+            dialogo_personalizzazione.Dialogo_Forme(frame);
+        });
+	}
+	
+	private void sceltaColore(ActionEvent e) {
+		if (e.getSource() == dialogo_personalizzazione.btnColore1) {
+			Color colore1 = sceltaColoreDialogo(colori.getColoreGradienza1());
+			colori.setColoreGradienza1(colore1);
+			System.out.println("Colore1 primitivo: " + colore1);
+			dialogo_personalizzazione.btnColore1.setBackground(colore1);
+			shapeDraw.repaint();
+		}
+		if (e.getSource() == dialogo_personalizzazione.btnColore2) {
+			Color colore2 = sceltaColoreDialogo(colori.getColoreGradienza2());
+			colori.setColoreGradienza2(colore2);
+			dialogo_personalizzazione.btnColore2.setBackground(colore2);
+			shapeDraw.repaint();
+		}
+	}
+		
+		private Color sceltaColoreDialogo(Color colorePrecedente) {
+			Color coloreScelto = JColorChooser.showDialog(dialogo_personalizzazione.getDialog(), "Seleziona un colore", colorePrecedente);
+			shapeDraw.repaint();
+			return coloreScelto;
+		}
+	
+	private void gradientColorDefiner() {
+		Color gradientColor1 = colori.getColoreGradienza1();
+		Color gradientColor2 = colori.getColoreGradienza2();
+		grafica.setColoreForme(new GradientPaint(0,0,gradientColor1,0,0,gradientColor2));
+		dialogo_personalizzazione.close();
+		grafica.setGradientMode(true);
 		repaint();
+		//		return gradientColor;
 	}
 
 	private void btnColorChange() {
-		Color coloreAttuale = this.grafica.getColorePrimario();
+		Color coloreAttuale = colori.getColorePrimario();
 		Color coloreScelto = JColorChooser.showDialog(this, "Seleziona un colore", coloreAttuale);
 		if (coloreScelto != null) {
 
@@ -358,9 +403,9 @@ public class jpaint_main extends JFrame implements MouseListener, MouseMotionLis
 */		if (interfaccia.rdbPennello.isSelected()) {
 			if (selectedItem.equals("Aerografo")) {
 				if (SwingUtilities.isLeftMouseButton(me)) {
-					grafica.tracciaAerografo(me.getX(), me.getY(), grafica.getColorePrimario());
+					grafica.tracciaAerografo(me.getX(), me.getY(), colori.getColorePrimario());
 				} else if (SwingUtilities.isRightMouseButton(me)) {
-					grafica.tracciaAerografo(me.getX(), me.getY(), grafica.getColoreSecondario());
+					grafica.tracciaAerografo(me.getX(), me.getY(), colori.getColoreSecondario());
 				}
 			}
 		}
@@ -371,15 +416,14 @@ public class jpaint_main extends JFrame implements MouseListener, MouseMotionLis
 		if (interfaccia.rdbPennello.isSelected()) {
 			if (selectedItem.equals("Aerografo")) {
 				if (SwingUtilities.isLeftMouseButton(me)) {
-					grafica.tracciaAerografo(me.getX(), me.getY(), grafica.getColorePrimario());
+					grafica.tracciaAerografo(me.getX(), me.getY(), colori.getColorePrimario());
 				} else if (SwingUtilities.isRightMouseButton(me)) {
-					grafica.tracciaAerografo(me.getX(), me.getY(), grafica.getColoreSecondario());
+					grafica.tracciaAerografo(me.getX(), me.getY(), colori.getColoreSecondario());
 				}
 			}
 		}
 		if (interfaccia.rdbLinea.isSelected()) {
 			startPoint = me.getPoint();
-			endPoint = startPoint;
 		}
 		if (interfaccia.rdbQuadrato.isSelected()) {
 			startPoint = me.getPoint();
@@ -397,19 +441,21 @@ public class jpaint_main extends JFrame implements MouseListener, MouseMotionLis
 
 	@Override
 	public void mouseReleased(MouseEvent me) {
+		if (grafica.getGradientMode() == true) {
+			grafica.setGradientMode(false);
+		}
 		if (interfaccia.rdbLinea.isSelected()) {
-			endPoint = me.getPoint();
-			grafica.tracciaLinea(startPoint, endPoint, grafica.getColorePrimario());
-			startPoint = endPoint = null;
+			grafica.aggiungiLinea(colori.getColorePrimario());
+			grafica.linea = null;
 			repaint();
 		}
 		if (interfaccia.rdbQuadrato.isSelected()) {
 			if (grafica.quadrato.width != 0 || grafica.quadrato.height != 0) {
 				if (SwingUtilities.isLeftMouseButton(me)) {
-					grafica.aggiungiQuadrato(grafica.quadrato, grafica.getColorePrimario());
+					grafica.aggiungiQuadrato(colori.getColorePrimario());
 				}
 				if (SwingUtilities.isRightMouseButton(me)) {
-					grafica.aggiungiQuadrato(grafica.quadrato, grafica.getColoreSecondario());
+					grafica.aggiungiQuadrato(colori.getColoreSecondario());
 				}
 			}
 			grafica.quadrato = null;
@@ -418,10 +464,10 @@ public class jpaint_main extends JFrame implements MouseListener, MouseMotionLis
 		if (interfaccia.rdbRettangolo.isSelected()) {
 			if (grafica.rettangolo.width != 0 || grafica.rettangolo.height != 0) {
 				if (SwingUtilities.isLeftMouseButton(me)) {
-					grafica.aggiungiRettangolo(grafica.rettangolo, grafica.getColorePrimario());
+					grafica.aggiungiRettangolo(colori.getColorePrimario());
 				}
 				if (SwingUtilities.isRightMouseButton(me)) {
-					grafica.aggiungiRettangolo(grafica.rettangolo, grafica.getColoreSecondario());
+					grafica.aggiungiRettangolo(colori.getColoreSecondario());
 				}
 			}
 			grafica.rettangolo = null;
@@ -430,10 +476,10 @@ public class jpaint_main extends JFrame implements MouseListener, MouseMotionLis
 		if (interfaccia.rdbCerchio.isSelected()) {
 			if (grafica.cerchio.width != 0 || grafica.cerchio.height != 0) {
 				if (SwingUtilities.isLeftMouseButton(me)) {
-					grafica.aggiungiCerchio(grafica.cerchio, grafica.getColorePrimario());
+					grafica.aggiungiCerchio(grafica.cerchio, colori.getColorePrimario());
 				}
 				if (SwingUtilities.isRightMouseButton(me)) {
-					grafica.aggiungiCerchio(grafica.cerchio, grafica.getColoreSecondario());
+					grafica.aggiungiCerchio(grafica.cerchio, colori.getColoreSecondario());
 				}
 			}
 			grafica.cerchio = null;
@@ -446,64 +492,62 @@ public class jpaint_main extends JFrame implements MouseListener, MouseMotionLis
 		if (interfaccia.rdbPennello.isSelected()) {
 			if (selectedItem.equals("Pennello")) {
 				if (SwingUtilities.isLeftMouseButton(me)) {
-					grafica.tracciaPennello(me.getX(), me.getY(), grafica.getColorePrimario());
+					grafica.tracciaPennello(me.getX(), me.getY(), colori.getColorePrimario());
 				} if (SwingUtilities.isRightMouseButton(me)) {
-					grafica.tracciaPennello(me.getX(), me.getY(), grafica.getColoreSecondario());
+					grafica.tracciaPennello(me.getX(), me.getY(), colori.getColoreSecondario());
 				}
 			}
 			if (selectedItem.equals("Aerografo")) {
 				if (SwingUtilities.isLeftMouseButton(me)) {
-					grafica.tracciaAerografo(me.getX(), me.getY(), grafica.getColorePrimario());
+					grafica.tracciaAerografo(me.getX(), me.getY(), colori.getColorePrimario());
 				} else if (SwingUtilities.isRightMouseButton(me)) {
-					grafica.tracciaAerografo(me.getX(), me.getY(), grafica.getColoreSecondario());
+					grafica.tracciaAerografo(me.getX(), me.getY(), colori.getColoreSecondario());
 				}
 			}
 		}
 		if (interfaccia.rdbMatita.isSelected()) {
 			if (SwingUtilities.isLeftMouseButton(me)) {
-				grafica.tracciaMatita(me.getX(), me.getY(), grafica.getColorePrimario());
+				grafica.tracciaMatita(me.getX(), me.getY(), colori.getColorePrimario());
 			} if (SwingUtilities.isRightMouseButton(me)) {
-				grafica.tracciaMatita(me.getX(), me.getY(), grafica.getColoreSecondario());
+				grafica.tracciaMatita(me.getX(), me.getY(), colori.getColoreSecondario());
 			}
 		}
 		if (interfaccia.rdbGomma.isSelected()) {
 			grafica.tracciaGomma(me.getX(), me.getY());
 		}
 		if (interfaccia.rdbLinea.isSelected()) {
-			endPoint = me.getPoint();
-			grafica.tracciaLinea(startPoint, endPoint, grafica.getColorePrimario());
-			startPoint = endPoint = null;
-			repaint();
+			grafica.tracciamentoLinea(startPoint, me.getX(), me.getY());
+			grafica.repaint();
 		}
 		if (interfaccia.rdbQuadrato.isSelected()) {
 			if (SwingUtilities.isLeftMouseButton(me)) {
-				grafica.setColoreForme(grafica.getColorePrimario());
+//				grafica.setColoreForme(grafica.getColorePrimario());
 				grafica.tracciamentoQuadrato(startPoint, me.getX(), me.getY());
 			}
 			if (SwingUtilities.isRightMouseButton(me)) {
-				grafica.setColoreForme(grafica.getColoreSecondario());
+//				grafica.setColoreForme(grafica.getColoreSecondario());
 				grafica.tracciamentoQuadrato(startPoint, me.getX(), me.getY());
 			}
 			grafica.repaint();
 		}
 		if (interfaccia.rdbRettangolo.isSelected()) {
 			if (SwingUtilities.isLeftMouseButton(me)) {
-				grafica.setColoreForme(grafica.getColorePrimario());
-				grafica.tracciamentoRettangolo(startPoint, me.getX(), me.getY());
+//				grafica.setColoreForme(grafica.getColorePrimario());
+				grafica.tracciamentoRettangolo(colori.getColorePrimario(), startPoint, me.getX(), me.getY());
 			}
 			if (SwingUtilities.isRightMouseButton(me)) {
-				grafica.setColoreForme(grafica.getColoreSecondario());
-				grafica.tracciamentoRettangolo(startPoint, me.getX(), me.getY());
+//				grafica.setColoreForme(grafica.getColoreSecondario());
+				grafica.tracciamentoRettangolo(colori.getColoreSecondario(), startPoint, me.getX(), me.getY());
 			}
 			grafica.repaint();
 		}
 		if (interfaccia.rdbCerchio.isSelected()) {
 			if (SwingUtilities.isLeftMouseButton(me)) {
-				grafica.setColoreForme(grafica.getColorePrimario());
+//				grafica.setColoreForme(grafica.getColorePrimario());
 				grafica.tracciamentoCerchio(startPoint, me.getX(), me.getY());
 			}
 			if (SwingUtilities.isRightMouseButton(me)) {
-				grafica.setColoreForme(grafica.getColoreSecondario());
+//				grafica.setColoreForme(grafica.getColoreSecondario());
 				grafica.tracciamentoCerchio(startPoint, me.getX(), me.getY());
 			}
 		}

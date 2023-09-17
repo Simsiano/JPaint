@@ -1,4 +1,4 @@
-package jpaint_interface;
+package swing_interface;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -19,7 +19,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.border.TitledBorder;
 
-public class jpaint_interfaccia {
+public class Interfaccia {
 
 	public JPanel panDisegno = new JPanel();
 	public JMenuItem newFile = new JMenuItem("Nuovo");
@@ -59,6 +59,7 @@ public class jpaint_interfaccia {
 	
 	public String[] opzioniForme = { "Vuoto", "Pieno" };
 	public JComboBox<String> boxStileForme = new JComboBox<String>(opzioniForme);
+	public JButton btnStilePersonalizzato = new JButton("Personalizza");
 
 	public Dimension btnColorSize = new Dimension(25, 25);
 	public Dimension btnColorSizeBig = new Dimension(25, 25);
@@ -86,7 +87,7 @@ public class jpaint_interfaccia {
 	public JRadioButton btnLayer1 = new JRadioButton("Layer 1");
 	public JRadioButton btnLayer2 = new JRadioButton("Layer 2");
 
-	public jpaint_icone icone = new jpaint_icone();
+	public Icone icone = new Icone();
 
 	public JMenuBar mainMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
@@ -191,11 +192,12 @@ public class jpaint_interfaccia {
 
 		paneTipoForme.setLayout(new FlowLayout(1));
 		TitledBorder titledBorder = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "  Forme  ",
-				2, 5);
+				2, 5);         
 		paneTipoForme.setBorder(titledBorder);
 		paneTipoForme.add(label);
 		paneTipoForme.add(boxTipoForme);
 		paneTipoForme.add(boxStileForme);
+		paneTipoForme.add(btnStilePersonalizzato);
 		return paneTipoForme;
 	}
 

@@ -1,4 +1,4 @@
-package jpaint_main;
+package main_package;
 
 import java.util.Collections;
 import javax.swing.UIManager;
@@ -6,11 +6,12 @@ import javax.swing.UnsupportedLookAndFeelException;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 //import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 
-public class jpaint {
+public class Main {
 
 	public static void main(String[] args) {
 		
-		jpaint_main jpaint = new jpaint_main();
+		JPaint jpaint = new JPaint();
+		
 		
 		FlatIntelliJLaf.setup();
 		
