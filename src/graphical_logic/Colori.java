@@ -12,7 +12,7 @@ public class Colori {
 	public void setColorePrimario(Color colore) {
 		Colori.colorePrimario = colore;
 	}
-	
+
 	public Color getColorePrimario() {
 		return colorePrimario;
 	}

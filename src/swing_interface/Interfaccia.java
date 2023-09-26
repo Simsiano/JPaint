@@ -2,6 +2,7 @@ package swing_interface;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -17,13 +18,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 public class Interfaccia {
 
 	public JPanel panDisegno = new JPanel();
 	public JMenuItem newFile = new JMenuItem("Nuovo");
+	public JMenuItem newFileAdv = new JMenuItem("Nuovo...");
 	public JMenuItem openFile = new JMenuItem("Apri");
+	public JMenuItem newSaveFile = new JMenuItem("Salva con nome...");
 	public JMenuItem saveFile = new JMenuItem("Salva");
 	public JMenuItem exit = new JMenuItem("Esci");
 
@@ -47,17 +51,17 @@ public class Interfaccia {
 	public JRadioButton rdbNull = new JRadioButton();
 ///////////////////////////////////////////////////////////////////////////////
 
-	public String[] dimensioni = { "1px", "2px", "3px", "4px", "5px", "Custom" };
+	private String[] dimensioni = { "1px", "2px", "3px", "4px", "5px", "Custom" };
 	public JComboBox<String> boxDimensioniMatita = new JComboBox<String>(dimensioni);
 
-	public String[] pennelli = { "Aerografo", "Pennello" };
+	private String[] pennelli = { "Aerografo", "Pennello" };
 	public JComboBox<String> boxTipoPennelli = new JComboBox<String>(pennelli);
 	public JButton btnOptionPannello = new JButton("...");
 
-	public String[] forme = { "----------", "Linea", "Quadrato", "Rettangolo", "Cerchio" };
+	private String[] forme = { "----------", "Linea", "Quadrato", "Rettangolo", "Cerchio" };
 	public JComboBox<String> boxTipoForme = new JComboBox<String>(forme);
 	
-	public String[] opzioniForme = { "Vuoto", "Pieno" };
+	private String[] opzioniForme = { "Vuoto", "Pieno" };
 	public JComboBox<String> boxStileForme = new JComboBox<String>(opzioniForme);
 	public JButton btnStilePersonalizzato = new JButton("Personalizza");
 
@@ -80,8 +84,23 @@ public class Interfaccia {
 	public JButton btnColoreCustom3 = new JButton();
 	public JButton btnColoreCustom4 = new JButton();
 	public JButton btnColoreCustom5 = new JButton();
+	
+	public JButton btnColorePalette1 = new JButton();
+	public JButton btnColorePalette2 = new JButton();
+	public JButton btnColorePalette3 = new JButton();
+	public JButton btnColorePalette4 = new JButton();
+	public JButton btnColorePalette5 = new JButton();
 
 	public JButton btnDetach = new JButton("\u2193");
+	
+	private JPanel bottomPaneInfo = new JPanel(); 
+	private JLabel mousePosition = new JLabel();
+	
+	private JLabel lblZoom = new JLabel("Zoom: ");
+	public JButton btnDeZoom = new JButton("-");
+	public JButton btnZoom = new JButton("+");
+	
+	public JLabel lblDimension = new JLabel();
 
 	public ButtonGroup bG = new ButtonGroup();
 	public JRadioButton btnLayer1 = new JRadioButton("Layer 1");
@@ -95,8 +114,12 @@ public class Interfaccia {
 		JMenu visualizza = new JMenu("Visualizza");
 		JMenu interfaccia = new JMenu("Interfaccia");
 		menuBar.add(file);
+		file.add(newFileAdv);
 		file.add(newFile);
+		file.addSeparator();
 		file.add(openFile);
+		file.addSeparator();
+		file.add(newSaveFile);
 		file.add(saveFile);
 		file.addSeparator();
 		file.add(exit);
@@ -282,6 +305,40 @@ public class Interfaccia {
 
 		return panCustomColori;
 	}
+	
+	public JPanel panelCustomPalette() {
+		JPanel panCustomPalette = new JPanel();
+		panCustomPalette.setLayout(new GridLayout(0, 5));
+		TitledBorder titledBorder = BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+				"  Paletta Colori  ", 2, 5);
+		panCustomPalette.setBorder(titledBorder);
+		
+		btnColorePalette1.setPreferredSize(btnColorSize);
+		btnColorePalette2.setPreferredSize(btnColorSize);
+		btnColorePalette3.setPreferredSize(btnColorSize);
+		btnColorePalette4.setPreferredSize(btnColorSize);
+		btnColorePalette5.setPreferredSize(btnColorSize);
+		
+		btnColorePalette1.setBackground(new Color(0, 0, 0));
+		btnColorePalette2.setBackground(new Color(0, 0, 0));
+		btnColorePalette3.setBackground(new Color(0, 0, 0));
+		btnColorePalette4.setBackground(new Color(0, 0, 0));
+		btnColorePalette5.setBackground(new Color(0, 0, 0));
+		
+		btnColorePalette1.setEnabled(false);
+		btnColorePalette2.setEnabled(false);
+		btnColorePalette3.setEnabled(false);
+		btnColorePalette4.setEnabled(false);
+		btnColorePalette5.setEnabled(false);
+		
+		panCustomPalette.add(btnColorePalette1);
+		panCustomPalette.add(btnColorePalette2);
+		panCustomPalette.add(btnColorePalette3);
+		panCustomPalette.add(btnColorePalette4);
+		panCustomPalette.add(btnColorePalette5);
+		
+		return panCustomPalette;
+	}
 
 	public JPanel panelShowPrimaryColor() {
 		JPanel panePrimaryColor = new JPanel();
@@ -343,6 +400,7 @@ public class Interfaccia {
 		panComandi.add(panelShowColor());
 		panComandi.add(panelColori());
 		panComandi.add(panelCustomColori());
+		panComandi.add(panelCustomPalette());
 		panComandi.add(panelChangeColor());
 		return panComandi;
 	}
@@ -356,7 +414,29 @@ public class Interfaccia {
 		bG.add(btnLayer2);
 		btnLayer1.isSelected();
 		paneDetach.add(btnLayer1);
+		btnLayer1.doClick();
 		paneDetach.add(btnLayer2);
 		return paneDetach;
+	}
+	
+	public void mouseLocation(int meX, int meY) {
+		bottomPaneInfo.remove(mousePosition);
+		mousePosition = new JLabel("X: " + meX + "   Y: " + meY, SwingConstants.RIGHT);
+		bottomPaneInfo.add(mousePosition);
+		bottomPaneInfo.repaint();
+		bottomPaneInfo.revalidate();
+	}
+	
+	public void dimensionUpdate(double width, double height) {
+		this.lblDimension.setText("  Larghezza: " + width + "  Altezza: " + height);
+	}
+	
+	public JPanel bottomPanelInfo() {
+		bottomPaneInfo.add(mousePosition);
+		bottomPaneInfo.add(lblZoom);
+		bottomPaneInfo.add(btnDeZoom);
+		bottomPaneInfo.add(btnZoom);
+		bottomPaneInfo.add(lblDimension);
+		return bottomPaneInfo;
 	}
 }

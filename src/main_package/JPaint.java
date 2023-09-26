@@ -8,7 +8,6 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -18,6 +17,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.AffineTransformOp;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -44,18 +45,25 @@ import javax.swing.JLabel;
 
 public class JPaint extends JFrame implements MouseListener, MouseMotionListener {
 	private static final long serialVersionUID = 1L;
-	private JPanel pan = new JPanel();
-	private JFileChooser fileChooser = new JFileChooser();
-	private Grafica grafica = new Grafica();
-	private Colori colori = new Colori();
-	private Interfaccia interfaccia = new Interfaccia();
-	private Interfaccia_ADV dialoghi = new Interfaccia_ADV();
-	private Custom_Shape dialogo_personalizzazione = new Custom_Shape();
-	private Custom_Shape_Draw shapeDraw = new Custom_Shape_Draw();
-	private Icone icona = new Icone();
+	private JPanel pan;
+	private JFileChooser fileChooser;
+	private Grafica grafica;
+	private Colori colori;
+	private Interfaccia interfaccia;
+	private Interfaccia_ADV dialoghi;
+	private Custom_Shape dialogo_personalizzazione;
+	private Custom_Shape_Draw shapeDraw;
+	private Icone icona;
 	private int NumberCustomButton = 0;
-	public BufferedImage buffer;
-	public Graphics2D gBuffer;
+	private int originalImageWidth;
+	private int originalImageHeight;
+	private BufferedImage oldBuffer;
+	private BufferedImage buffer;
+	private Graphics2D gBuffer;
+	private Graphics2D layer1;
+	private Graphics2D layer2;
+	private boolean fileSaved;
+	private File outputFile;
 	private File filePicked;
 	private int fileChoosed;
 	private String selectedItem;
@@ -63,12 +71,23 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 
 	public JPaint() {
 
+		this.pan = new JPanel();
+		this.fileChooser = new JFileChooser();
+		this.grafica = new Grafica();
+		this.colori = new Colori();
+		this.interfaccia = new Interfaccia();
+		this.dialoghi = new Interfaccia_ADV();
+		this.dialogo_personalizzazione = new Custom_Shape();
+		this.shapeDraw = new Custom_Shape_Draw();
+		this.icona = new Icone();
+
 		interfaccia.newFile.addActionListener(e -> newFile());
 		interfaccia.openFile.addActionListener(e -> openFile());
+		interfaccia.newSaveFile.addActionListener(e -> newSaveFile());
 		interfaccia.saveFile.addActionListener(e -> saveFile());
 		interfaccia.exit.addActionListener(e -> exit());
 
-//		interfaccia.strumenti.addActionListener(this);
+		//		interfaccia.strumenti.addActionListener(this);
 
 		dialoghi.btnMatita.addActionListener(e -> interfaceMatita(e));
 		dialoghi.btnGomma.addActionListener(e -> interfaceGomma(e));
@@ -98,8 +117,14 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 		interfaccia.btnColoreCustom4.addMouseListener(new ActionColor());
 		interfaccia.btnColoreCustom5.addMouseListener(new ActionColor());
 
+		interfaccia.btnDeZoom.addActionListener(e -> DeZoomImageTest2());
+		interfaccia.btnZoom.addActionListener(e -> ZoomImageTest2());
+
 		interfaccia.btnDetach.addActionListener(e -> this.panelDetach());
-		
+
+		interfaccia.btnLayer1.addActionListener(e -> layerSelector(e));
+		interfaccia.btnLayer2.addActionListener(e -> layerSelector(e));
+
 		grafica.addMouseListener(this);
 		grafica.addMouseMotionListener(this);
 		JLabel test = new JLabel();
@@ -108,19 +133,21 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 		interfaccia.panDisegno.setLayout(new BorderLayout());
 
 		JScrollPane scroll = new JScrollPane(grafica);
-		interfaccia.panDisegno.add(scroll, "Center");
+		//		interfaccia.panDisegno.add(scroll, "Center");
 
 		setJMenuBar(interfaccia.mainMenuBar());
 
 		pan.setLayout(new BorderLayout());
-		pan.add(interfaccia.tabbedPane(), "North");
-		pan.add(interfaccia.panDisegno, "Center");
+		pan.add(interfaccia.tabbedPane(), BorderLayout.NORTH);
+		pan.add(scroll, BorderLayout.CENTER);
+		pan.add(interfaccia.bottomPanelInfo(), BorderLayout.SOUTH);
+
 		getContentPane().add(pan);
 		setTitle("Immagine - JPaint");
 		setIconImage(icona.logo);
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//		int width = ((int) screenSize.getWidth());
-//		int height = ((int) screenSize.getHeight());
+		//		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		//		int width = ((int) screenSize.getWidth());
+		//		int height = ((int) screenSize.getHeight());
 		setPreferredSize(new Dimension(1270, 800));
 		setMaximumSize(new Dimension(1280, 800));
 		setMinimumSize(new Dimension(1280, 800));
@@ -131,16 +158,26 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 			@Override
 			public void windowClosing(WindowEvent e) {
 				int choose = JOptionPane.showConfirmDialog(null,
-				"Vuoi veramente uscire?", "Conferma chiusura", 
-				JOptionPane.YES_NO_OPTION,
-				JOptionPane.INFORMATION_MESSAGE);
+						"Vuoi veramente uscire?", "Conferma chiusura", 
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.INFORMATION_MESSAGE);
 				if (choose == JOptionPane.YES_OPTION) {
 					e.getWindow().dispose();
 				} else {
 					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 				}
-			 }
-		 });
+			}
+		});
+		setVisible(true);
+	}
+
+	private void layerSelector(ActionEvent e) {
+		String selected = e.getSource().toString();
+		if (selected.equals("Layer 1")) {
+			grafica.setgBuffer(layer1);
+		} else if (selected.equals("Layer 2")){
+			grafica.setgBuffer(layer2);
+		}
 	}
 
 	private void newFile() {
@@ -153,47 +190,204 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 	}
 
 	private void openFile() {
+		fileChoosed = fileChooser.showDialog(null, null);
+		if (!(fileChoosed == JFileChooser.APPROVE_OPTION)) {}
 		filePicked = new File(fileChooser.getSelectedFile().getAbsolutePath());
 		try {
 			buffer = ImageIO.read(filePicked);
-			if (buffer.getWidth() > 800 || buffer.getHeight() > 600) {
+			fileSaved = false;
+			/*			if (buffer.getWidth() > 800 || buffer.getHeight() > 600) {
 				String error = "Dimensioni immagine troppo grandi";
 				JOptionPane.showMessageDialog(null, error, "Errore", 0);
 			} else {
-				setTitle("JPaint" + filePicked.getName());
-				grafica.setLARGHEZZA(this.buffer.getHeight());
-				grafica.setALTEZZA(this.buffer.getHeight());
-				grafica.setBuffer(this.buffer);
-				gBuffer = this.buffer.createGraphics();
-				grafica.setgBuffer(this.gBuffer);
-				grafica.repaint();
-				grafica.revalidate();
-			}
+			 */				setTitle(filePicked.getName() + " - JPaint");
+			 this.originalImageWidth = buffer.getWidth();
+			 this.originalImageHeight = buffer.getHeight();
+			 grafica.setLARGHEZZA(this.buffer.getWidth());
+			 grafica.setALTEZZA(this.buffer.getHeight());
+			 grafica.setBuffer(this.buffer);
+			 gBuffer = this.buffer.createGraphics();
+			 grafica.setgBuffer(this.gBuffer);
+			 grafica.repaint();
+			 grafica.revalidate();
+			 //			}
 		} catch (IOException io) {
 			io.printStackTrace();
 		}
 	}
 
-	private void saveFile() {
+	private void newSaveFile() {
 		fileChoosed = fileChooser.showDialog(null, null);
 		if (fileChoosed == JFileChooser.APPROVE_OPTION) {
-			File outputFile = fileChooser.getSelectedFile();
-            String filePath = outputFile.getAbsolutePath();
-            
-            try {
-                ImageIO.write(grafica.getBuffer(), "PNG", outputFile);
-                setTitle(filePath + " - JPaint");
-                System.out.println("Immagine salvata: " + filePath);
-            } catch (IOException e) {
-                System.out.println("Error saving image: " + e.getMessage());
-            }
+			outputFile = fileChooser.getSelectedFile();
+			String filePath = outputFile.getAbsolutePath();
+
+			try {
+				ImageIO.write(grafica.getBuffer(), "PNG", outputFile);
+				setTitle(outputFile.getName() + " - JPaint");
+				System.out.println("Immagine salvata: " + filePath);
+				fileSaved = true;
+			} catch (IOException e) {
+				System.out.println("Error saving image: " + e.getMessage());
+			}
 		} else {
 			System.out.println("Nothing");
 		}
 	}
 
+	private void saveFile() {
+		if (fileSaved==false) {
+			newSaveFile();
+		}
+		try {
+			ImageIO.write(grafica.getBuffer(), "PNG", outputFile);
+		} catch (IOException e) {
+			System.out.println("Error saving image: " + e.getMessage());
+		}
+	}
+
 	private void exit() {
 		dispose();
+	}
+
+	private void DeZoomImage() {
+		double width = grafica.getBuffer().getWidth();
+		double height = grafica.getBuffer().getHeight();
+		if (width<=375) {
+			return;
+		}
+		BufferedImage dezoom = new BufferedImage((int)(width*0.5), (int)(height*0.5), BufferedImage.TYPE_INT_ARGB);
+		AffineTransform at = new AffineTransform();
+		at.scale(0.5, 0.5);
+		AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+		scaleOp.filter(grafica.getBuffer(), dezoom);
+		grafica.setBuffer(dezoom);
+		Graphics2D gBuffer = dezoom.createGraphics();
+		grafica.setgBuffer(gBuffer);
+		System.out.println("Dezoom");
+		System.out.println(grafica.getBuffer().getWidth());
+		System.out.println(grafica.getBuffer().getHeight());
+		interfaccia.dimensionUpdate(grafica.getBuffer().getWidth(), grafica.getBuffer().getHeight());
+		grafica.repaint();
+		dezoom = null;
+		gBuffer = null;
+		at = null;
+		scaleOp = null;
+		System.gc();
+	}
+
+	private void ZoomImage() {
+		double width = grafica.getBuffer().getWidth();
+		double height = grafica.getBuffer().getHeight();
+		BufferedImage zoom = new BufferedImage((int)(width*2), (int)(height*2), BufferedImage.TYPE_INT_ARGB);
+		AffineTransform at = new AffineTransform();
+		at.scale(2, 2);
+		AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+		scaleOp.filter(grafica.getBuffer(), zoom);
+		grafica.setBuffer(zoom);
+		Graphics2D gBuffer = zoom.createGraphics();
+		grafica.setgBuffer(gBuffer);
+		System.out.println("Zoom");
+		System.out.println(grafica.getBuffer().getWidth());
+		System.out.println(grafica.getBuffer().getHeight());
+		interfaccia.dimensionUpdate(grafica.getBuffer().getWidth(), grafica.getBuffer().getHeight());
+		grafica.repaint();
+		zoom = null;
+		gBuffer = null;
+		at = null;
+		scaleOp = null;
+		System.gc();
+	}
+
+	private void DeZoomImageTest() {
+		int width = grafica.getBuffer().getWidth();
+		int height = grafica.getBuffer().getHeight();
+		BufferedImage vecchio = grafica.getBuffer();
+		BufferedImage dezoom = new BufferedImage((int)(width*0.5), (int)(height*0.5), BufferedImage.TYPE_INT_ARGB);
+		grafica.setBuffer(dezoom);
+		Graphics2D gBuffer = dezoom.createGraphics();
+		gBuffer.scale(0.5, 0.5);
+		grafica.setgBuffer(gBuffer);
+		grafica.getgBuffer().drawImage(vecchio, 0, 0, this);
+		System.out.println("Dezoom");
+		System.out.println(grafica.getBuffer().getWidth());
+		System.out.println(grafica.getBuffer().getHeight());
+		interfaccia.dimensionUpdate(grafica.getBuffer().getWidth(), grafica.getBuffer().getHeight());
+		grafica.repaint();
+		dezoom = null;
+		gBuffer = null;
+		System.gc();
+		grafica.repaint();
+	}
+
+	private void ZoomImageTest() {
+		int width = grafica.getBuffer().getWidth();
+		int height = grafica.getBuffer().getHeight();
+		BufferedImage vecchio = grafica.getBuffer();
+		BufferedImage zoom = new BufferedImage((int)(width*2), (int)(height*2), BufferedImage.TYPE_INT_ARGB);
+		grafica.setBuffer(zoom);
+		Graphics2D gBuffer = zoom.createGraphics();
+		gBuffer.scale(2, 2);
+		grafica.setgBuffer(gBuffer);
+		grafica.getgBuffer().drawImage(vecchio, 0, 0, this);
+		System.out.println("Zoom");
+		System.out.println(grafica.getBuffer().getWidth());
+		System.out.println(grafica.getBuffer().getHeight());
+		interfaccia.dimensionUpdate(grafica.getBuffer().getWidth(), grafica.getBuffer().getHeight());
+		grafica.repaint();
+		zoom = null;
+		gBuffer = null;
+		System.gc();
+	}
+
+	private void ZoomImageTest2() {
+		double width = grafica.getBuffer().getWidth()*2;
+		double height = grafica.getBuffer().getHeight()*2;
+		if (this.originalImageWidth > width && this.originalImageHeight > height) {
+			oldBuffer = grafica.getBuffer();
+		}
+		BufferedImage vecchio = grafica.getBuffer();
+		BufferedImage dezoom = new BufferedImage((int)(width), (int)(height), BufferedImage.TYPE_INT_ARGB);
+		grafica.setBuffer(dezoom);
+
+		Graphics2D gBuffer = dezoom.createGraphics();
+		gBuffer.scale(2, 2);
+		grafica.setgBuffer(gBuffer);
+		grafica.getgBuffer().drawImage(vecchio, 0, 0, this);
+		System.out.println("Dezoom");
+		System.out.println(grafica.getBuffer().getWidth());
+		System.out.println(grafica.getBuffer().getHeight());
+		interfaccia.dimensionUpdate(grafica.getBuffer().getWidth(), grafica.getBuffer().getHeight());
+		grafica.repaint();
+		dezoom = null;
+		gBuffer = null;
+		System.gc();
+		grafica.repaint();
+	}
+
+	private void DeZoomImageTest2() {
+		double width = grafica.getBuffer().getWidth()*0.5;
+		double height = grafica.getBuffer().getHeight()*0.5;
+		if (this.originalImageWidth > width && this.originalImageHeight > height) {
+			oldBuffer = grafica.getBuffer();
+		}
+		BufferedImage vecchio = grafica.getBuffer();
+		BufferedImage dezoom = new BufferedImage((int)(width), (int)(height), BufferedImage.TYPE_INT_ARGB);
+		grafica.setBuffer(dezoom);
+		Graphics2D gBuffer = dezoom.createGraphics();
+		gBuffer.scale(0.5, 0.5);
+		grafica.setgBuffer(gBuffer);
+		grafica.getgBuffer().drawImage(vecchio, 0, 0, this);
+		System.out.println("Dezoom");
+		System.out.println(grafica.getBuffer().getWidth());
+		System.out.println(grafica.getBuffer().getHeight());
+		interfaccia.dimensionUpdate(grafica.getBuffer().getWidth(), grafica.getBuffer().getHeight());
+		grafica.repaint();
+		dezoom = null;
+		gBuffer = null;
+		System.gc();
+		grafica.repaint();
+
 	}
 
 	private void actionTipoPennelli() {
@@ -205,10 +399,10 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 		}
 		System.out.println(selectedItem);
 	}
-	
+
 	private void setterPennello() {
 		if (interfaccia.rdbPennello.isSelected() && selectedItem.toString().equals("Pennello")) {
-			
+
 		} else {}
 	}
 
@@ -230,6 +424,7 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 
 	private void boxDimensionLinea() {
 		StringBuilder selectedItem = new StringBuilder(new String((String) interfaccia.boxDimensioniMatita.getSelectedItem()));
+		//		String selectedItem = new String((String) interfaccia.boxDimensioniMatita.getSelectedItem());
 		System.out.println(selectedItem);
 		if (selectedItem.toString().equals("Custom")) {
 			JLabel label = new JLabel("Inserisci uno spessore");
@@ -246,6 +441,10 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 			} else {
 			}
 		} else {
+			String a = selectedItem.substring(1, 3);
+			System.out.println(a);
+			//			grafica.setSpessore((int)(selectedItem.substring(1, 3)));
+
 			grafica.setSpessore(Integer.parseInt(selectedItem.delete(1, 3).toString()));
 		}
 	}
@@ -268,7 +467,7 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 			interfaccia.rdbCerchio.setSelected(true);
 		}
 	}
-	
+
 	private void actionStileForme() {
 		String selectedItem = new String((String) interfaccia.boxStileForme.getSelectedItem());
 		if (selectedItem.equals("Vuoto")) {
@@ -292,19 +491,19 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 		colori.setColoreSecondario(colorDefiner(me));
 		repaint();
 	}
-	
+
 	private Color colorDefiner(MouseEvent me) {
 		JButton clickedButton = (JButton) me.getSource();
 		Color colorDraw = clickedButton.getBackground();
 		return colorDraw;
 	}
-	
+
 	private void dialogoAperturaPersonalizzazione(JFrame frame) {
 		SwingUtilities.invokeLater(() -> {
-            dialogo_personalizzazione.Dialogo_Forme(frame);
-        });
+			dialogo_personalizzazione.Dialogo_Forme(frame);
+		});
 	}
-	
+
 	private void sceltaColore(ActionEvent e) {
 		if (e.getSource() == dialogo_personalizzazione.btnColore1) {
 			Color colore1 = sceltaColoreDialogo(colori.getColoreGradienza1());
@@ -320,21 +519,18 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 			shapeDraw.repaint();
 		}
 	}
-		
-		private Color sceltaColoreDialogo(Color colorePrecedente) {
-			Color coloreScelto = JColorChooser.showDialog(dialogo_personalizzazione.getDialog(), "Seleziona un colore", colorePrecedente);
-			shapeDraw.repaint();
-			return coloreScelto;
-		}
-	
+
+	private Color sceltaColoreDialogo(Color colorePrecedente) {
+		Color coloreScelto = JColorChooser.showDialog(dialogo_personalizzazione.getDialog(), "Seleziona un colore", colorePrecedente);
+		shapeDraw.repaint();
+		return coloreScelto;
+	}
+
 	private void gradientColorDefiner() {
-		Color gradientColor1 = colori.getColoreGradienza1();
-		Color gradientColor2 = colori.getColoreGradienza2();
-		grafica.setColoreForme(new GradientPaint(0,0,gradientColor1,0,0,gradientColor2));
+		grafica.setColoreForme(new GradientPaint(0,0,colori.getColoreGradienza1(),0,0,colori.getColoreGradienza2()));
 		dialogo_personalizzazione.close();
 		grafica.setGradientMode(true);
 		repaint();
-		//		return gradientColor;
 	}
 
 	private void btnColorChange() {
@@ -343,8 +539,8 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 		if (coloreScelto != null) {
 
 			NumberCustomButton++;
-			
-//			interfaccia.btnColorePrimario.setBackground(coloreScelto);
+
+			//			interfaccia.btnColorePrimario.setBackground(coloreScelto);
 			interfaccia.btnColorChange.setBackground(coloreScelto);
 
 			switch (NumberCustomButton) {
@@ -374,15 +570,18 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 				NumberCustomButton = 0;
 			}
 			}
-//			grafica.setColorePrimario(coloreScelto);
+			//			grafica.setColorePrimario(coloreScelto);
 			repaint();
 		}
+	}
+	
+	public void actionColorDropper() {
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent me) {
 		Cursor cursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
-		setCursor(cursor);
+		setCursor(cursor);	
 	}
 
 	@Override
@@ -393,22 +592,29 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 
 	@Override
 	public void mouseClicked(MouseEvent me) {
-/*		if (interfaccia.rdbCerchio.isSelected()) {
+		/*		if (interfaccia.rdbCerchio.isSelected()) {
 			if (SwingUtilities.isLeftMouseButton(me)) {
 				grafica.aggiungiCerchio(me.getX(), me.getY(), grafica.getColorePrimario());
 			} else if (SwingUtilities.isRightMouseButton(me)) {
 				grafica.aggiungiCerchio(me.getX(), me.getY(), grafica.getColoreSecondario());
 			}
 		}
-*/		if (interfaccia.rdbPennello.isSelected()) {
-			if (selectedItem.equals("Aerografo")) {
-				if (SwingUtilities.isLeftMouseButton(me)) {
-					grafica.tracciaAerografo(me.getX(), me.getY(), colori.getColorePrimario());
-				} else if (SwingUtilities.isRightMouseButton(me)) {
-					grafica.tracciaAerografo(me.getX(), me.getY(), colori.getColoreSecondario());
-				}
+*/		
+		if (interfaccia.rdbContaGoccie.isSelected()) {
+			if (SwingUtilities.isLeftMouseButton(me)) {
+				grafica.getColorDropperColor(me.getX(), me.getY());
+				System.out.println("Funziona");
 			}
 		}
+		if (interfaccia.rdbPennello.isSelected()) {
+			 if (selectedItem.equals("Aerografo")) {
+				 if (SwingUtilities.isLeftMouseButton(me)) {
+					 grafica.tracciaAerografo(me.getX(), me.getY(), colori.getColorePrimario());
+				 } else if (SwingUtilities.isRightMouseButton(me)) {
+					 grafica.tracciaAerografo(me.getX(), me.getY(), colori.getColoreSecondario());
+				 }
+			 }
+		 }
 	}
 
 	@Override
@@ -489,6 +695,7 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 	}
 
 	public void mouseDragged(MouseEvent me) {
+		interfaccia.mouseLocation(me.getX(), me.getY());
 		if (interfaccia.rdbPennello.isSelected()) {
 			if (selectedItem.equals("Pennello")) {
 				if (SwingUtilities.isLeftMouseButton(me)) {
@@ -521,33 +728,33 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 		}
 		if (interfaccia.rdbQuadrato.isSelected()) {
 			if (SwingUtilities.isLeftMouseButton(me)) {
-//				grafica.setColoreForme(grafica.getColorePrimario());
+				//				grafica.setColoreForme(grafica.getColorePrimario());
 				grafica.tracciamentoQuadrato(startPoint, me.getX(), me.getY());
 			}
 			if (SwingUtilities.isRightMouseButton(me)) {
-//				grafica.setColoreForme(grafica.getColoreSecondario());
+				//				grafica.setColoreForme(grafica.getColoreSecondario());
 				grafica.tracciamentoQuadrato(startPoint, me.getX(), me.getY());
 			}
 			grafica.repaint();
 		}
 		if (interfaccia.rdbRettangolo.isSelected()) {
 			if (SwingUtilities.isLeftMouseButton(me)) {
-//				grafica.setColoreForme(grafica.getColorePrimario());
+				//				grafica.setColoreForme(grafica.getColorePrimario());
 				grafica.tracciamentoRettangolo(colori.getColorePrimario(), startPoint, me.getX(), me.getY());
 			}
 			if (SwingUtilities.isRightMouseButton(me)) {
-//				grafica.setColoreForme(grafica.getColoreSecondario());
+				//				grafica.setColoreForme(grafica.getColoreSecondario());
 				grafica.tracciamentoRettangolo(colori.getColoreSecondario(), startPoint, me.getX(), me.getY());
 			}
 			grafica.repaint();
 		}
 		if (interfaccia.rdbCerchio.isSelected()) {
 			if (SwingUtilities.isLeftMouseButton(me)) {
-//				grafica.setColoreForme(grafica.getColorePrimario());
+				//				grafica.setColoreForme(grafica.getColorePrimario());
 				grafica.tracciamentoCerchio(startPoint, me.getX(), me.getY());
 			}
 			if (SwingUtilities.isRightMouseButton(me)) {
-//				grafica.setColoreForme(grafica.getColoreSecondario());
+				//				grafica.setColoreForme(grafica.getColoreSecondario());
 				grafica.tracciamentoCerchio(startPoint, me.getX(), me.getY());
 			}
 		}
@@ -555,6 +762,7 @@ public class JPaint extends JFrame implements MouseListener, MouseMotionListener
 
 	@Override
 	public void mouseMoved(MouseEvent me) {
+		interfaccia.mouseLocation(me.getX(), me.getY());
 	}
 
 	private class ActionColor extends MouseAdapter {

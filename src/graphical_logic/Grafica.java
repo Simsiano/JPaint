@@ -2,6 +2,7 @@ package graphical_logic;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -14,11 +15,14 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 import javax.swing.JPanel;
 
+import swing_interface.Interfaccia;
+
 public class Grafica extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private Colori colore = new Colori();
-	private BufferedImage ImageBuffer = new BufferedImage(1500, 600, BufferedImage.TYPE_INT_ARGB);
+	private Colori colori = new Colori();
+	private Interfaccia interfaccia = new Interfaccia();
+	private BufferedImage ImageBuffer = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
 	private Graphics2D gBuffer = ImageBuffer.createGraphics();
 	public Line2D.Double linea;
 	public Rectangle quadrato;
@@ -38,16 +42,22 @@ public class Grafica extends JPanel {
 	public Grafica() {
 		pulisci();
 	}
+	
 	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
+	public Dimension getPreferredSize() {
+		return new Dimension(ImageBuffer.getWidth(), ImageBuffer.getHeight());
+	}
+	
+	@Override
+	protected void paintComponent(Graphics mainGraphics) {
+		super.paintComponent(mainGraphics);
 		gBuffer = ImageBuffer.createGraphics();
 		gBuffer.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
-		g.drawImage(ImageBuffer, 0, 0, this);
+		mainGraphics.drawImage(ImageBuffer, 0, 0, this);
 		
 		if (linea != null) {
-			Graphics2D g2d = (Graphics2D)g;
+			Graphics2D g2d = (Graphics2D)mainGraphics;
 			g2d.setStroke(new BasicStroke(spessoreForme));
 			if (gradientMode == true) {
 				g2d.setPaint(coloreForme);
@@ -57,7 +67,7 @@ public class Grafica extends JPanel {
 		}
 		
 		if (quadrato != null) {
-			Graphics2D g2d = (Graphics2D)g;
+			Graphics2D g2d = (Graphics2D)mainGraphics;
 			g2d.setStroke(new BasicStroke(spessoreForme));
 			g2d.setPaint(coloreForme);
 			if (pieno == true) {
@@ -68,7 +78,7 @@ public class Grafica extends JPanel {
 		}
 		
 		if (rettangolo != null) {
-			Graphics2D g2d = (Graphics2D)g;
+			Graphics2D g2d = (Graphics2D)mainGraphics;
 			g2d.setStroke(new BasicStroke(spessoreForme));
 			g2d.setPaint(coloreForme);
 			if (pieno == true) {
@@ -79,7 +89,7 @@ public class Grafica extends JPanel {
 		}
 		
 		if (cerchio != null) {
-			Graphics2D g2d = (Graphics2D)g;
+			Graphics2D g2d = (Graphics2D)mainGraphics;
 			g2d.setStroke(new BasicStroke(spessoreForme));
 			g2d.setPaint(coloreForme);
 			if (pieno == true) {
@@ -127,7 +137,7 @@ public class Grafica extends JPanel {
 	
 	public void tracciaPennello(int x, int y, Color color) {
 		if (posX != -1) {
-        	float alpha = 0.25f;
+ //       	float alpha = 0.25f;
  //       	Color color = new Color(colore.getRed(), colore.getGreen(), colore.getBlue(), alpha);
 			gBuffer.setPaint(color);
 			gBuffer.setStroke(new BasicStroke(Spessore));
@@ -137,6 +147,13 @@ public class Grafica extends JPanel {
 		}
 		posX = x;
 		posY = y;
+	}
+	
+	public void getColorDropperColor(int x, int y) {
+		Color color = new Color(ImageBuffer.getRGB(x, y));
+		colori.setColorePrimario(color);
+		interfaccia.btnColorePrimario.setBackground(color);
+		interfaccia.btnColorePrimario.repaint();
 	}
 
 	public void tracciaAerografo(int x, int y, Color colore) {
@@ -246,7 +263,7 @@ public class Grafica extends JPanel {
 	public void tracciamentoCerchio(Point startPoint, int meX, int meY) {
 		
 		int radius = (int) startPoint.distance(startPoint);
-        int diameter = radius * 2;
+//        int diameter = radius * 2;
         int x = (int) startPoint.getX() - radius;
         int y = (int) startPoint.getY() - radius;
         cerchio = new Ellipse2D.Double(meX, meY, x, y);

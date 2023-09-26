@@ -1,36 +1,23 @@
 package swing_interface;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
-import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 
 import graphical_logic.Colori;
 
 public class Custom_Shape {
-	 /*
-	 * 
-	*/
-	private Custom_Shape_Draw drawShape;
-	
-	private static final long serialVersionUID = 1L;
-	
-	private Colori colori = new Colori();
 
-	private Icone icona = new Icone();
+	private Custom_Shape_Draw drawShape;
+	private Colori colori;
+	private Icone icona;
 	
 	private JDialog dialog;
 	
@@ -48,6 +35,10 @@ public class Custom_Shape {
 	}
 	
 	public JDialog Dialogo_Forme(JFrame parentFrame) {
+		
+		drawShape = new Custom_Shape_Draw();
+		colori = new Colori();
+		icona = new Icone();
 		
 		dialog = new JDialog(parentFrame, "Personalizza", true);
 		
