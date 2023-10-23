@@ -1,5 +1,7 @@
 package graphical_logic;
 
+import static swing_interface.Interfaccia.btnColorePrimario;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -13,31 +15,29 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
-import javax.swing.JPanel;
 
-import swing_interface.Interfaccia;
+import javax.swing.JPanel;
 
 public class Grafica extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private Colori colori = new Colori();
-	private Interfaccia interfaccia = new Interfaccia();
-	private BufferedImage ImageBuffer = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
-	private Graphics2D gBuffer = ImageBuffer.createGraphics();
-	public Line2D.Double linea;
-	public Rectangle quadrato;
-	public Rectangle rettangolo;
-	public Ellipse2D.Double cerchio;
-	private int LARGHEZZA = 800;
-	private int ALTEZZA = 600;
-	private GradientPaint coloreForme;
-	private boolean pieno;
-	private boolean gradientMode;
-	private int Spessore = 3;
-	private int spessoreForme = 3;
-	private int tempSpessore = 3;
-	private int posX = -1;
-	private int posY = -1;
+	private  Colori colori = new Colori();
+	private  int LARGHEZZA = 800;
+	private  int ALTEZZA = 600;
+	private  BufferedImage ImageBuffer = new BufferedImage(LARGHEZZA, ALTEZZA, BufferedImage.TYPE_INT_ARGB);
+	private  Graphics2D gBuffer = ImageBuffer.createGraphics();
+	public  Line2D.Double linea;
+	public  Rectangle quadrato;
+	public  Rectangle rettangolo;
+	public  Ellipse2D.Double cerchio;
+	private static  GradientPaint coloreForme;
+	private  boolean pieno;
+	private  boolean gradientMode;
+	private  int Spessore = 3;
+	private  int spessoreForme = 3;
+	private  int tempSpessore = 3;
+	private  int posX = -1;
+	private  int posY = -1;
 
 	public Grafica() {
 		pulisci();
@@ -103,8 +103,6 @@ public class Grafica extends JPanel {
 	
 
 	public void pulisci() {
-		LARGHEZZA = ImageBuffer.getWidth();
-		ALTEZZA = ImageBuffer.getHeight();
 		gBuffer.setColor(Color.WHITE);
 		gBuffer.fillRect(0, 0, LARGHEZZA, ALTEZZA);
 		repaint();
@@ -152,8 +150,8 @@ public class Grafica extends JPanel {
 	public void getColorDropperColor(int x, int y) {
 		Color color = new Color(ImageBuffer.getRGB(x, y));
 		colori.setColorePrimario(color);
-		interfaccia.btnColorePrimario.setBackground(color);
-		interfaccia.btnColorePrimario.repaint();
+		btnColorePrimario.setBackground(color);
+		btnColorePrimario.repaint();
 	}
 
 	public void tracciaAerografo(int x, int y, Color colore) {
@@ -178,7 +176,6 @@ public class Grafica extends JPanel {
 				try {
 					wait();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				repaint();
@@ -297,24 +294,24 @@ public class Grafica extends JPanel {
 		posY = -1;
 	}
 
-	public BufferedImage getBuffer() {
+	public BufferedImage getImageBuffer() {
 		return this.ImageBuffer;
 	}
 
-	public void setBuffer(BufferedImage buffer) {
+	public void setImageBuffer(BufferedImage buffer) {
 		this.ImageBuffer = buffer;
 	}
 
-	public Graphics2D getgBuffer() {
+	public Graphics2D getGraphicsBuffer() {
 		return this.gBuffer;
 	}
 
-	public void setgBuffer(Graphics2D gBuffer) {
+	public void setGraphicsBuffer(Graphics2D gBuffer) {
 		this.gBuffer = gBuffer;
 	}
 	
 	public void setColoreForme(GradientPaint coloreForme) {
-		this.coloreForme = coloreForme;
+		Grafica.coloreForme = coloreForme;
 	}
 	
 	public boolean getPieno() {
@@ -357,15 +354,12 @@ public class Grafica extends JPanel {
 		return this.LARGHEZZA;
 	}
 
-	public void setLARGHEZZA(int LARGHEZZA) {
-		this.LARGHEZZA = LARGHEZZA;
-	}
-
 	public int getALTEZZA() {
 		return this.ALTEZZA;
 	}
 
-	public void setALTEZZA(int ALTEZZA) {
-		this.ALTEZZA = ALTEZZA;
+	public void setDimensioniBuffer(int l, int a) {
+		ImageBuffer = new BufferedImage(l, a, BufferedImage.TYPE_INT_ARGB);
+		gBuffer = ImageBuffer.createGraphics();
 	}
 }

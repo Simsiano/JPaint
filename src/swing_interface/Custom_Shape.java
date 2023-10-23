@@ -4,12 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import javax.swing.JFrame;
+
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 
 import graphical_logic.Colori;
 

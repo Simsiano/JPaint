@@ -2,10 +2,10 @@ package swing_interface;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -69,8 +69,8 @@ public class Interfaccia {
 	public Dimension btnColorSizeBig = new Dimension(25, 25);
 
 	public JButton btnColorChange = new JButton();
-	public JButton btnColorePrimario = new JButton();
-	public JButton btnColoreSecondario = new JButton();
+	public static JButton btnColorePrimario = new JButton();
+	public static JButton btnColoreSecondario = new JButton();
 
 	public JButton btnColoreRosso = new JButton();
 	public JButton btnColoreVerde = new JButton();
