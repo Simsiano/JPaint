@@ -21,6 +21,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
+import components_herlper.CButton;
+
 public class Interfaccia {
 
 	public JPanel panDisegno = new JPanel();
@@ -68,28 +70,28 @@ public class Interfaccia {
 	public Dimension btnColorSize = new Dimension(25, 25);
 	public Dimension btnColorSizeBig = new Dimension(25, 25);
 
-	public JButton btnColorChange = new JButton();
-	public static JButton btnColorePrimario = new JButton();
-	public static JButton btnColoreSecondario = new JButton();
+	public CButton btnColorChange = new CButton(true,true);
+	public static CButton btnColorePrimario = new CButton(true,false);
+	public static CButton btnColoreSecondario = new CButton(true,false);
 
-	public JButton btnColoreRosso = new JButton();
-	public JButton btnColoreVerde = new JButton();
-	public JButton btnColoreBlu = new JButton();
-	public JButton btnColoreGiallo = new JButton();
-	public JButton btnColoreNero = new JButton();
-	public JButton btnColoreBianco = new JButton();
+	public CButton btnColoreRosso = new CButton(Color.RED);
+	public CButton btnColoreVerde = new CButton(Color.GREEN);
+	public CButton btnColoreBlu = new CButton(Color.BLUE);
+	public CButton btnColoreGiallo = new CButton(Color.YELLOW);
+	public CButton btnColoreNero = new CButton(Color.BLACK);
+	public CButton btnColoreBianco = new CButton(Color.WHITE);
 
-	public JButton btnColoreCustom1 = new JButton();
-	public JButton btnColoreCustom2 = new JButton();
-	public JButton btnColoreCustom3 = new JButton();
-	public JButton btnColoreCustom4 = new JButton();
-	public JButton btnColoreCustom5 = new JButton();
+	public CButton btnColoreCustom1 = new CButton();
+	public CButton btnColoreCustom2 = new CButton();
+	public CButton btnColoreCustom3 = new CButton();
+	public CButton btnColoreCustom4 = new CButton();
+	public CButton btnColoreCustom5 = new CButton();
 	
-	public JButton btnColorePalette1 = new JButton();
-	public JButton btnColorePalette2 = new JButton();
-	public JButton btnColorePalette3 = new JButton();
-	public JButton btnColorePalette4 = new JButton();
-	public JButton btnColorePalette5 = new JButton();
+	public CButton btnColorePalette1 = new CButton();
+	public CButton btnColorePalette2 = new CButton();
+	public CButton btnColorePalette3 = new CButton();
+	public CButton btnColorePalette4 = new CButton();
+	public CButton btnColorePalette5 = new CButton();
 
 	public JButton btnDetach = new JButton("\u2193");
 	
