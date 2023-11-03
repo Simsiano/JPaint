@@ -180,17 +180,17 @@ public class AzioniMouse implements MouseListener, MouseMotionListener {
 			grafica.tracciaGomma(me.getX(), me.getY());
 		}
 		if (interfaccia.rdbLinea.isSelected()) {
-			grafica.tracciamentoLinea(startPoint, me.getX(), me.getY());
+			grafica.tracciamentoLinea(colori.getColorePrimario(), startPoint, me.getX(), me.getY());
 			grafica.repaint();
 		}
 		if (interfaccia.rdbQuadrato.isSelected()) {
 			if (SwingUtilities.isLeftMouseButton(me)) {
 				//				grafica.setColoreForme(grafica.getColorePrimario());
-				grafica.tracciamentoQuadrato(startPoint, me.getX(), me.getY());
+				grafica.tracciamentoQuadrato(colori.getColorePrimario(), startPoint, me.getX(), me.getY());
 			}
 			if (SwingUtilities.isRightMouseButton(me)) {
 				//				grafica.setColoreForme(grafica.getColoreSecondario());
-				grafica.tracciamentoQuadrato(startPoint, me.getX(), me.getY());
+				grafica.tracciamentoQuadrato(colori.getColoreSecondario(),startPoint, me.getX(), me.getY());
 			}
 			grafica.repaint();
 		}

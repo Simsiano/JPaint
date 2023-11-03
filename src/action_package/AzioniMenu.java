@@ -55,12 +55,8 @@ public class AzioniMenu {
 			try {
 				System.out.println("Larghezza field" + larghezza.getText());
 				System.out.println("Altezza field" + altezza.getText());
-				grafica.setDimensioniBuffer(Integer.parseInt(larghezza.getText()), Integer.parseInt(altezza.getText()));
+				grafica.aggiornaDimensioni(Integer.parseInt(larghezza.getText()), Integer.parseInt(altezza.getText()));
 				grafica.pulisci();
-				System.out.println("larghzza" + grafica.getLARGHEZZA());
-				System.out.println("altezza" + grafica.getALTEZZA());
-				System.out.println("Buffer larghezza:" + grafica.getImageBuffer().getWidth());
-				System.out.println("Buffer altezzza:" + grafica.getImageBuffer().getHeight());
 			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(frame, ex, "Errore", JOptionPane.ERROR_MESSAGE);
 			}
@@ -81,9 +77,9 @@ public class AzioniMenu {
 			 */				frame.setTitle(filePicked.getName() + " - JPaint");
 //			 grafica.setLARGHEZZA(this.buffer.getWidth());
 //			 grafica.setALTEZZA(this.buffer.getHeight());
-			 grafica.setImageBuffer(this.buffer);
+//			 grafica.setImageBuffer(this.buffer);
 			 gBuffer = this.buffer.createGraphics();
-			 grafica.setGraphicsBuffer(this.gBuffer);
+//			 grafica.setGraphicsBuffer(this.gBuffer);
 			 grafica.repaint();
 			 grafica.revalidate();
 			 //			}
@@ -93,7 +89,7 @@ public class AzioniMenu {
 	}
 	
 	public void newSaveFile() {
-		fileChoosed = fileChooser.showDialog(null, null);
+/*		fileChoosed = fileChooser.showDialog(null, null);
 		if (fileChoosed == JFileChooser.APPROVE_OPTION) {
 			outputFile = fileChooser.getSelectedFile();
 			String filePath = outputFile.getAbsolutePath();
@@ -109,17 +105,17 @@ public class AzioniMenu {
 		} else {
 			System.out.println("Nothing");
 		}
-	}
+*/	}
 	
 	public void saveFile() {
 		if (fileSaved==false) {
 			newSaveFile();
 		}
-		try {
-			ImageIO.write(grafica.getImageBuffer(), "PNG", outputFile);
-		} catch (IOException e) {
-			System.out.println("Error saving image: " + e.getMessage());
-		}
+//		try {
+//			ImageIO.write(grafica.getImageBuffer(), "PNG", outputFile);
+//		} catch (IOException e) {
+//			System.out.println("Error saving image: " + e.getMessage());
+//		}
 	}
 	
 	public void exit() {
