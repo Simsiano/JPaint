@@ -29,8 +29,10 @@ public class Tela extends TelaVuota {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g2d = (Graphics2D)g;
-		
+		g2d = (Graphics2D) g;
+
+		g2d.setStroke(Grafica.getGraphics2D(Grafica.index).getStroke());
+		g2d.setPaint(Grafica.getGraphics2D(Grafica.index).getPaint());
 		
 		if (seleziona != null) {
 			grafica.draw(seleziona, g2d);
@@ -53,7 +55,7 @@ public class Tela extends TelaVuota {
 		}
 		
 		grafica.drawAllLayers(g2d);
-
+		
 	}
 
 }

@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -18,6 +20,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
+import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 
 import graphics.Grafica;
@@ -55,6 +58,7 @@ public class Interfaccia {
 
 	private String[] dimensioni = { "1px", "2px", "3px", "4px", "5px", "Custom" };
 	public JComboBox<String> boxDimensioniMatita = new JComboBox<String>(dimensioni);
+	public JButton btnCustomStroke = new JButton("...");
 
 	private String[] pennelli = { "Aerografo", "Pennello" };
 	public JComboBox<String> boxTipoPennelli = new JComboBox<String>(pennelli);
@@ -65,7 +69,7 @@ public class Interfaccia {
 	
 	private String[] opzioniForme = { "Vuoto", "Pieno" };
 	public JComboBox<String> boxStileForme = new JComboBox<String>(opzioniForme);
-	public JButton btnGradienza = new JButton("Personalizza");
+	public JButton btnGradienza = new JButton("...");
 
 	public Dimension btnColorSize = new Dimension(25, 25);
 	public Dimension btnColorSizeBig = new Dimension(25, 25);
@@ -102,18 +106,16 @@ public class Interfaccia {
 	public JButton btnDeZoom = new JButton("-");
 	public JButton btnZoom = new JButton("+");
 	
+	private Runtime runtime = Runtime.getRuntime();
+	public JLabel lblTotal = new JLabel();
+	public JButton btnGC = new JButton("GC");
+	
 	public JLabel lblDimension = new JLabel();
 
 	public static JButton btnIndietro = new JButton("Indietro");
 	public static JButton btnAvanti = new JButton("Avanti");
 	public JButton btnSelezionaLayer = new JButton("Seleziona layer");
 	public JButton btnAggiungiLayer = new JButton("Aggiungi layer");
-	
-	public ButtonGroup bG = new ButtonGroup();
-//	public JRadioButton btnLayer1 = new JRadioButton("Layer 1");
-	public JRadioButton btnLayer2 = new JRadioButton("Layer 2");
-
-	public Icone icone = new Icone();
 
 	public JMenuBar mainMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
@@ -192,6 +194,7 @@ public class Interfaccia {
 		paneDimensioniDisegno.setBorder(titledBorder);
 		paneDimensioniDisegno.add(label);
 		paneDimensioniDisegno.add(boxDimensioniMatita);
+		paneDimensioniDisegno.add(btnCustomStroke);
 
 		return paneDimensioniDisegno;
 	}
@@ -382,12 +385,33 @@ public class Interfaccia {
 		this.lblDimension.setText("  Larghezza: " + width + "  Altezza: " + height);
 	}
 	
+	private JLabel memoriaOccupata() {
+		JLabel lbLabel = new JLabel();
+		Timer timer = new Timer(3000, new ActionListener() {
+			@Override
+            public void actionPerformed(ActionEvent e) {
+            	lbLabel.setText(formatMemory(runtime.freeMemory()));
+            	lblTotal.setText(formatMemory(runtime.totalMemory()));
+            }
+		});
+		timer.start();
+		return lbLabel;
+	}
+	
 	public JPanel bottomPanelInfo() {
 		bottomPaneInfo.add(mousePosition);
 		bottomPaneInfo.add(lblZoom);
 		bottomPaneInfo.add(btnDeZoom);
 		bottomPaneInfo.add(btnZoom);
 		bottomPaneInfo.add(lblDimension);
+		bottomPaneInfo.add(memoriaOccupata());
+		bottomPaneInfo.add(lblTotal);
+		bottomPaneInfo.add(btnGC);
 		return bottomPaneInfo;
 	}
+	
+	private static String formatMemory(long bytes) {
+        double megabytes = bytes / (1024.0 * 1024.0);
+        return String.format("%.2f MB", megabytes);
+    }
 }

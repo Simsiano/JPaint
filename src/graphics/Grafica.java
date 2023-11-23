@@ -102,7 +102,7 @@ public class Grafica extends AzioniStacks {
 	public void addLayer(int width, int height) {
 		bufferedImagesLayers.add(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
 		graphics2dsLayers.add(bufferedImagesLayers.get(bufferedImagesLayers.size()-1).createGraphics());
-		graphics2dsLayers.get(bufferedImagesLayers.size()-1).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		graphics2dsLayers.get(bufferedImagesLayers.size()-1).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 		index = bufferedImagesLayers.size() - 1;
 		setColor(index, Color.BLACK);
 	}
@@ -286,6 +286,7 @@ public class Grafica extends AzioniStacks {
 		setPaint(colore);
 		if (riempito == true) graphics2dsLayers.get(index).fill(shape);
 		graphics2dsLayers.get(index).draw(shape);
+		tela.repaint();
 	}
 
 	/**

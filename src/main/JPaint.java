@@ -19,6 +19,7 @@ import actions.AzioniMouse;
 import graphics.Grafica;
 import graphics.Tela;
 import gui.DialogoGradienza;
+import gui.DialogoSpessore;
 import gui.Icone;
 import gui.Interfaccia;
 
@@ -28,17 +29,16 @@ public class JPaint {
 	private JPanel pan;
 	private Tela tela = new Tela(800,600);
 	private Interfaccia interfaccia = new Interfaccia();
-	private DialogoGradienza dialogoGradienza = new DialogoGradienza(frame);
+	private DialogoGradienza dialogoGradienza = new DialogoGradienza();
+	private DialogoSpessore dialogoSpessore = new DialogoSpessore();
 	private AzioniMenu azioniMenu = new AzioniMenu(frame,tela.grafica);
 	private AzioniColori azioniColori = new AzioniColori(frame);
-	private AzioniBottoni azioniBottoni = new AzioniBottoni(frame,tela.grafica,interfaccia,dialogoGradienza);
+	private AzioniBottoni azioniBottoni = new AzioniBottoni(frame,tela.grafica,interfaccia,dialogoGradienza,dialogoSpessore);
 	private AzioniMouse azioniMouse = new AzioniMouse(tela, tela.grafica, interfaccia);
-	private Icone icona;
 	
 	public JPaint() {
 		
 		this.pan = new JPanel();
-		this.icona = new Icone();
 
 		interfaccia.newFile.addActionListener(e -> azioniMenu.newFile());
 		interfaccia.newFileAdv.addActionListener(e -> azioniMenu.newFileAdv());
@@ -52,7 +52,9 @@ public class JPaint {
 //		interfaccia.btnOptionPannello.addActionListener(e -> setterPennello());
 		interfaccia.boxTipoForme.addActionListener(e -> azioniBottoni.actionTipoForme());
 		interfaccia.boxStileForme.addActionListener(e -> azioniBottoni.actionStileForme());
-		interfaccia.btnGradienza.addActionListener(e -> azioniBottoni.dialogoAperturaPersonalizzazione());
+		interfaccia.btnGradienza.addActionListener(e -> azioniBottoni.dialogoGradienza());
+		interfaccia.btnCustomStroke.addActionListener(e -> azioniBottoni.dialogoSpessore());
+		interfaccia.btnGC.addActionListener(e -> System.gc());
 		
 		dialogoGradienza.btnColore1.addActionListener(e -> azioniBottoni.sceltaColore(e));
 		dialogoGradienza.btnColore2.addActionListener(e -> azioniBottoni.sceltaColore(e));
@@ -96,7 +98,7 @@ public class JPaint {
 
 		frame.getContentPane().add(pan);
 		frame.setTitle("Immagine - JPaint");
-		frame.setIconImage(icona.logo);
+		frame.setIconImage(Icone.LOGO);
 		frame.setPreferredSize(new Dimension(1270, 800));
 		frame.setMaximumSize(new Dimension(1280, 800));
 		frame.setMinimumSize(new Dimension(1280, 800));

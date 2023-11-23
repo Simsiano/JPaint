@@ -13,7 +13,7 @@ import javax.swing.SwingUtilities;
 import graphics.Colori;
 import graphics.Grafica;
 import gui.DialogoGradienza;
-import gui.DialogoGradienzaDraw;
+import gui.DialogoSpessore;
 import gui.Interfaccia;
 
 public class AzioniBottoni {
@@ -23,17 +23,17 @@ public class AzioniBottoni {
 	private Grafica grafica;
 	private Interfaccia interfaccia;
 	private DialogoGradienza dialogoGradienza;
-	private DialogoGradienzaDraw shapeDraw;
+	private DialogoSpessore dialogoSpessore;
 	
-	public static String selectedItem = "";
 	private int NumberCustomButton = 0;
+	public static String selectedItem = "";
 	
-	public AzioniBottoni(JFrame frame, Grafica grafica, Interfaccia interfaccia, DialogoGradienza dialogoGradienza) {
+	public AzioniBottoni(JFrame frame, Grafica grafica, Interfaccia interfaccia, DialogoGradienza dialogoGradienza, DialogoSpessore dialogoSpessore) {
 		this.frame = frame;
 		this.grafica = grafica;
 		this.interfaccia = interfaccia;
 		this.dialogoGradienza = dialogoGradienza;
-		this.shapeDraw = new DialogoGradienzaDraw();
+		this.dialogoSpessore = dialogoSpessore;
 	}
 	
 	public void boxDimensionLinea() {
@@ -95,9 +95,15 @@ public class AzioniBottoni {
 		}
 	}
 	
-	public void dialogoAperturaPersonalizzazione() {
+	public void dialogoGradienza() {
 		SwingUtilities.invokeLater(() -> {
-			dialogoGradienza.getDialog();
+			dialogoGradienza.getDialog(frame);
+		});
+	}
+	
+	public void dialogoSpessore() {
+		SwingUtilities.invokeLater(() -> {
+			dialogoSpessore.getDialog(frame);
 		});
 	}
 	
@@ -106,20 +112,17 @@ public class AzioniBottoni {
 			Color colore1 = sceltaColoreDialogo(Colori.getColoreGradienza1());
 			Colori.setColoreGradienza1(colore1);
 			dialogoGradienza.btnColore1.setBackground(colore1);
-			shapeDraw.repaint();
 		}
 		if (e.getSource() == dialogoGradienza.btnColore2) {
 			Color colore2 = sceltaColoreDialogo(Colori.getColoreGradienza2());
 			Colori.setColoreGradienza2(colore2);
 			dialogoGradienza.btnColore2.setBackground(colore2);
-			shapeDraw.repaint();
 		}
 	}
 	
 	private Color sceltaColoreDialogo(Color colorePrecedente) {
 		Color coloreScelto = JColorChooser.showDialog(null, "Seleziona un colore", colorePrecedente);
 		if (coloreScelto==null) return colorePrecedente;
-		shapeDraw.repaint();
 		return coloreScelto;
 	}
 

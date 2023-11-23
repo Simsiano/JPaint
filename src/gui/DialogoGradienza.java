@@ -4,6 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -16,28 +21,33 @@ import graphics.Colori;
 
 public class DialogoGradienza {
 	
-	private JFrame frame;
 	private JDialog dialog;
 	
 	private DialogoGradienzaDraw drawShape;
-	private Icone icona;
 	
-	private JLabel lblColore1 = new JLabel("Colore 1");
-	private JLabel lblColore2 = new JLabel("Colore 2");
+	private JLabel lblColore1;
+	private JLabel lblColore2;
 		
-	public JButton btnColore1 = new JButton();
-	public JButton btnColore2 = new JButton();
+	public JButton btnColore1;
+	public JButton btnColore2;
 	
-	public JButton btnConfermaGradienza = new JButton("Conferma");
+	public JButton btnConfermaGradienza;
 
 	
-	public DialogoGradienza(JFrame frame) {
-		this.frame = frame;
+	public DialogoGradienza() {
+		
 		drawShape = new DialogoGradienzaDraw();
-		icona = new Icone();
+		
+		lblColore1 = new JLabel("Colore 1");
+		lblColore2 = new JLabel("Colore 2");
+		
+		btnColore1 = new JButton();
+		btnColore2 = new JButton();
+		
+		btnConfermaGradienza = new JButton("Conferma");
 	}
 	
-	public JDialog getDialog() {
+	public JDialog getDialog(JFrame frame) {
 		
 		dialog = new JDialog(frame,"Personalizza",true);
 		
@@ -82,7 +92,11 @@ public class DialogoGradienza {
 		dialog.setLocationRelativeTo(frame);
 		dialog.setModalityType(ModalityType.APPLICATION_MODAL);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.setIconImage(icona.vuoto);
+		dialog.setIconImage(Icone.VUOTO);
+		dialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				System.gc();}});
 		dialog.setVisible(true);
 		
 		return dialog;
@@ -95,4 +109,18 @@ public class DialogoGradienza {
 	
 }
 
-
+class DialogoGradienzaDraw extends JPanel {
+	
+	private static final long serialVersionUID = 1L;
+	
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		Graphics2D g2d = (Graphics2D)g;
+		GradientPaint paint = new GradientPaint(0, 75, Colori.getColoreGradienza1(), 100, 100, Colori.getColoreGradienza2());
+		g2d.setPaint(paint);
+		g2d.fillRect(0, 75, 100, 100);
+		repaint();
+		g2d.dispose();
+	}
+}

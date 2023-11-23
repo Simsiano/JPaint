@@ -27,7 +27,6 @@ public class Launcher {
 					FlatMacDarkLaf.setGlobalExtraDefaults(Collections.singletonMap("@accentColor", "#f00"));
 					FlatMacDarkLaf.revalidateAndRepaintAllFramesAndDialogs();
 				} catch (UnsupportedLookAndFeelException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
