@@ -2,7 +2,6 @@ package main;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -12,33 +11,55 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
-import actions.AzioniBottoni;
-import actions.AzioniColori;
-import actions.AzioniMenu;
-import actions.AzioniMouse;
-import graphics.Grafica;
-import graphics.Tela;
-import gui.DialogoGradienza;
-import gui.DialogoSpessore;
-import gui.Icone;
-import gui.Interfaccia;
+import azioni.AzioniBottoni;
+import azioni.AzioniColori;
+import azioni.AzioniMenu;
+import azioni.AzioniMouse;
+import azioni.AzioniRDB;
+import azioni.dialoghi.AzioniDialogoGradienza;
+import azioni.dialoghi.AzioniDialogoSpessore;
+import grafica.Grafica;
+import grafica.Tela;
+import interfaccia.AccentColor;
+import interfaccia.Icone;
+import interfaccia.Interfaccia;
+import interfaccia.dialoghi.DialogoGradienza;
+import interfaccia.dialoghi.DialogoSpessore;
 
 public class JPaint {
 
-	private JFrame frame = new JFrame();
+	private JFrame frame;
 	private JPanel pan;
-	private Tela tela = new Tela(800,600);
-	private Interfaccia interfaccia = new Interfaccia();
-	private DialogoGradienza dialogoGradienza = new DialogoGradienza();
-	private DialogoSpessore dialogoSpessore = new DialogoSpessore();
-	private AzioniMenu azioniMenu = new AzioniMenu(frame,tela.grafica);
-	private AzioniColori azioniColori = new AzioniColori(frame);
-	private AzioniBottoni azioniBottoni = new AzioniBottoni(frame,tela.grafica,interfaccia,dialogoGradienza,dialogoSpessore);
-	private AzioniMouse azioniMouse = new AzioniMouse(tela, tela.grafica, interfaccia);
-	
+	private Tela tela;
+	private Interfaccia interfaccia;
+	private DialogoSpessore dialogoSpessore;
+	private AzioniDialogoSpessore azioniDialogoSpessore;
+	private DialogoGradienza dialogoGradienza;
+	private AzioniDialogoGradienza azioniDialogoGradienza;
+	private AzioniMenu azioniMenu ;
+	private AzioniColori azioniColori;
+	private AzioniBottoni azioniBottoni;
+	private AzioniRDB azioniRdb;
+	private AzioniMouse azioniMouse;
+
+	public JScrollPane scroll;
+
 	public JPaint() {
-		
+
+		this.frame = new JFrame();
 		this.pan = new JPanel();
+		this.tela = new Tela(pan, 800, 600);
+		this.scroll = new JScrollPane(tela);
+		this.interfaccia = new Interfaccia();
+		this.dialogoSpessore = new DialogoSpessore();
+		this.azioniDialogoSpessore = new AzioniDialogoSpessore(frame, dialogoSpessore);
+		this.dialogoGradienza = new DialogoGradienza();
+		this.azioniDialogoGradienza = new AzioniDialogoGradienza(frame, dialogoGradienza);
+		this.azioniMenu = new AzioniMenu(frame, tela.grafica);
+		this.azioniColori = new AzioniColori(frame);
+		this.azioniBottoni = new AzioniBottoni(frame,tela.grafica,interfaccia);
+		this.azioniMouse = new AzioniMouse(tela, tela.grafica, interfaccia);
+		this.azioniRdb = new AzioniRDB();
 
 		interfaccia.newFile.addActionListener(e -> azioniMenu.newFile());
 		interfaccia.newFileAdv.addActionListener(e -> azioniMenu.newFileAdv());
@@ -47,18 +68,21 @@ public class JPaint {
 		interfaccia.saveFile.addActionListener(e -> azioniMenu.saveFile());
 		interfaccia.exit.addActionListener(e -> azioniMenu.exit());
 
+		interfaccia.rdbMatita.addActionListener(e -> azioniRdb.setCuroreMatita());
+		interfaccia.rdbGomma.addActionListener(e -> azioniRdb.setCursoreGomma());
+
 		interfaccia.boxDimensioniMatita.addActionListener(e -> azioniBottoni.boxDimensionLinea());
 		interfaccia.boxTipoPennelli.addActionListener(e -> azioniBottoni.actionTipoPennelli());
 //		interfaccia.btnOptionPannello.addActionListener(e -> setterPennello());
 		interfaccia.boxTipoForme.addActionListener(e -> azioniBottoni.actionTipoForme());
 		interfaccia.boxStileForme.addActionListener(e -> azioniBottoni.actionStileForme());
-		interfaccia.btnGradienza.addActionListener(e -> azioniBottoni.dialogoGradienza());
-		interfaccia.btnCustomStroke.addActionListener(e -> azioniBottoni.dialogoSpessore());
-		interfaccia.btnGC.addActionListener(e -> System.gc());
-		
-		dialogoGradienza.btnColore1.addActionListener(e -> azioniBottoni.sceltaColore(e));
-		dialogoGradienza.btnColore2.addActionListener(e -> azioniBottoni.sceltaColore(e));
-		dialogoGradienza.btnConfermaGradienza.addActionListener(e -> azioniBottoni.gradientColorDefiner());
+		interfaccia.btnCustomStroke.addActionListener(e -> azioniDialogoSpessore.dialogoSpessore());
+		interfaccia.btnGradienza.addActionListener(e -> azioniDialogoGradienza.dialogoGradienza());
+		interfaccia.btnGC.addActionListener(e -> Launcher.updateColor(AccentColor.RED));
+
+		dialogoGradienza.btnColore1.addActionListener(e -> azioniDialogoGradienza.sceltaColore(e));
+		dialogoGradienza.btnColore2.addActionListener(e -> azioniDialogoGradienza.sceltaColore(e));
+		dialogoGradienza.btnConfermaGradienza.addActionListener(e -> azioniDialogoGradienza.gradientColorDefiner());
 
 		interfaccia.btnColoreRosso.addMouseListener(azioniColori.getActionColor());
 		interfaccia.btnColoreVerde.addMouseListener(azioniColori.getActionColor());
@@ -74,7 +98,7 @@ public class JPaint {
 		interfaccia.btnColoreCustom3.addMouseListener(azioniColori.getActionColor());
 		interfaccia.btnColoreCustom4.addMouseListener(azioniColori.getActionColor());
 		interfaccia.btnColoreCustom5.addMouseListener(azioniColori.getActionColor());
-		
+
 		Interfaccia.btnIndietro.addActionListener(e -> tela.grafica.undo());
 		Interfaccia.btnAvanti.addActionListener(e -> tela.grafica.redo());
 		interfaccia.btnSelezionaLayer.addActionListener(e -> Grafica.selectLayer(frame));
@@ -85,7 +109,7 @@ public class JPaint {
 
 		interfaccia.panDisegno.setLayout(new BorderLayout());
 
-		JScrollPane scroll = new JScrollPane(tela);
+
 		//		interfaccia.panDisegno.add(scroll, "Center");
 
 		frame.setJMenuBar(interfaccia.mainMenuBar());
@@ -96,6 +120,7 @@ public class JPaint {
 		scroll.setPreferredSize(new Dimension(Grafica.larghezza,Grafica.altezza));
 		pan.add(interfaccia.bottomPanelInfo(), BorderLayout.SOUTH);
 
+		frame.setUndecorated(false);
 		frame.getContentPane().add(pan);
 		frame.setTitle("Immagine - JPaint");
 		frame.setIconImage(Icone.LOGO);
@@ -103,13 +128,13 @@ public class JPaint {
 		frame.setMaximumSize(new Dimension(1280, 800));
 		frame.setMinimumSize(new Dimension(1280, 800));
 		frame.setResizable(true);
-		frame.setExtendedState(Frame.MAXIMIZED_BOTH); 
+//		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				int choose = JOptionPane.showConfirmDialog(null,
-						"Vuoi veramente uscire?", "Conferma chiusura", 
+						"Vuoi veramente uscire?", "Conferma chiusura",
 						JOptionPane.YES_NO_OPTION,
 						JOptionPane.INFORMATION_MESSAGE);
 				if (choose == JOptionPane.YES_OPTION) {
@@ -121,5 +146,5 @@ public class JPaint {
 		});
 		frame.setVisible(true);
 	}
-	
+
 }

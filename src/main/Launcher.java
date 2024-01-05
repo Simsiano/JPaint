@@ -1,48 +1,46 @@
 package main;
 
+import java.awt.Color;
 import java.util.Collections;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import com.formdev.flatlaf.FlatLaf;
 //import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 
 public class Launcher {
 
-	public static void main(String[] args) {
+	public static void updateColor(String color) {
+		FlatLaf.setGlobalExtraDefaults(Collections.singletonMap("@accentColor", color));
+		FlatLaf.revalidateAndRepaintAllFramesAndDialogs();
 		FlatMacDarkLaf.setup();
-//		JPaint jpaint = new JPaint();
+	}
+
+	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				
-				new JPaint();
-				
-				FlatMacDarkLaf.updateUI();
-				
+
+//				FlatMacDarkLaf.setGlobalExtraDefaults(Collections.singletonMap("@accentColor", AccentColor.RED));
+//				FlatMacDarkLaf.setup();
+
+				FlatMacDarkLaf.setup();
+
 				try {
 					UIManager.setLookAndFeel(new FlatMacDarkLaf());
-					FlatMacDarkLaf.setGlobalExtraDefaults(Collections.singletonMap("@accentColor", "#f00"));
-					FlatMacDarkLaf.revalidateAndRepaintAllFramesAndDialogs();
+					UIManager.put("Button.focusColor", Color.RED);
+					FlatLaf.updateUILater();
+					FlatMacDarkLaf.setup();
+					new JPaint();
+					FlatMacDarkLaf.setup();
+
 				} catch (UnsupportedLookAndFeelException e) {
 					e.printStackTrace();
 				}
 			}
 		});
-				
-		
-/*		try {
-			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-			SwingUtilities.updateComponentTreeUI(jpaint);
-			jpaint.pack();
-		} catch (ClassNotFoundException | IllegalAccessException | InstantiationException
-				| UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
-		}
-*/		
-
 	}
-
 }

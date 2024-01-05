@@ -6,12 +6,12 @@ import java.awt.Dimension;
 import javax.swing.JButton;
 
 /**
- * 
+ *
  */
 public class CButton extends JButton {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	private Dimension btnColorSize = new Dimension(25, 25);
 
 	/**
@@ -22,7 +22,7 @@ public class CButton extends JButton {
 		this.setPreferredSize(btnColorSize);
 		this.setEnabled(false);
 	}
-	
+
 	/**
 	 * Costruttore adebito a quei bottoni che possono essere attivi/disattivi e/o
 	 * evidenziati o non.
@@ -36,7 +36,7 @@ public class CButton extends JButton {
 		this.setEnabled(enabled);
 		this.setFocusPainted(focusPainted);
 	}
-	
+
 	/**
 	 * Costruttore adebito a bottoni attivi e che devono essere inizializzati
 	 * con un colore specifico.
@@ -48,12 +48,5 @@ public class CButton extends JButton {
 		this.setPreferredSize(btnColorSize);
 		this.setFocusPainted(false);
 	}
-	/*
-	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		g.setColor(color);
-		g.fillRect(0, 0, 25, 25);
-	}
-	*/
+
 }
